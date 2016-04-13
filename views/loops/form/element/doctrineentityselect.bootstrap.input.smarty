@@ -1,0 +1,111 @@
+<script>
+    jQuery(function(){
+        var guard     = false;
+        var name      = '{$name}';
+        var input     = jQuery('#{$loopsid}');
+        var holder    = jQuery('#{$loopsid}-holder');
+        var wrapper   = jQuery('#{$loopsid}-wrapper');
+        var prev      = wrapper.prev();
+        var modellist = jQuery('#{$entitylist->loopsid}');
+        
+        input.prop('loaded', false);
+        
+        input.bind('set', function(e, val) {
+            input.val(val);
+            if(val === null || typeof val == 'undefined') {
+                input.removeAttr('name');
+            }
+            else {
+                input.attr('name', name);
+            }
+        });
+        
+        input.bind('open', function() {
+            wrapper.show();
+            wrapper.css('min-width', prev.outerWidth());
+            wrapper.position( { my: 'left top', at: 'left bottom', of: prev } );
+        });
+        
+        input.bind('close', function() {
+            wrapper.hide();
+        });
+        
+        holder.on('focus click', function() {
+            if(input.prop('loaded')) {
+                input.trigger('open');
+            }
+            else {
+                input.prop('loaded', true);
+                
+                jQuery.ajax({
+                    url     : '{$domain}{$pagepath}/entitylist',
+                    type    : 'GET',
+                    success : function() {
+                        loops.ajaxSuccess.apply(null, arguments);
+                        input.trigger('open');
+                        jQuery("#{$entitylist->loopsid}").bind('set', function(e, identifier, key) {
+                            jQuery.each(identifier, function(key, value) {
+                                jQuery("#{$loopsid}-input-"+key).val(value).prop('disabled', false);
+                            });
+                            jQuery("#{$loopsid}-holder").html(jQuery("#{$loopsid}-entitylist-"+key).html());
+                            jQuery("#{$loopsid}-delete button").prop('disabled', false);
+                            input.trigger('close');
+                        });
+                    }
+                });
+            }
+        });
+        
+        holder.add(wrapper).click(function(e) {
+            guard = true;
+        });
+        
+        jQuery(':focusable').not(holder).focus(function(e) {
+            input.trigger('close');
+        });
+        
+        jQuery(window).click(function() {
+            if(!guard) {
+                input.trigger('close');
+            }
+            guard = false;
+        });
+    });
+</script>
+{$metadata=$loops->database->metadata($entitylist->entity)}
+{if $value}
+    {foreach from=$metadata->getIdentifierValues($value) key=k item=v}
+        <input type="hidden" id="{$loopsid}-input-{$k}" name="{$name}-{$k}" value="{$v|escape}">
+    {/foreach}
+{else}
+    {foreach from=$metadata->getIdentifier() item=k}
+        <input type="hidden" id="{$loopsid}-input-{$k}" name="{$name}-{$k}" disabled>
+    {/foreach}
+{/if}
+
+<div id="{$loopsid|escape}-default" class="hidden">
+    {block 'default'}Click to select a '{$entitylist->entity|escape}' entity.{/block}
+</div>
+
+<div class="input-group">
+    <div id="{$loopsid|escape}-holder" class="form-control" style="height:auto; cursor: pointer" tabindex="0">
+        {block 'holder'}
+            {if $value}
+                {$value|render:TRUE}
+            {else}
+                <script>
+                    jQuery({"#$loopsid-holder"|json_encode}).html(jQuery({"#$loopsid-default"|json_encode}).html());
+                </script>
+            {/if}
+        {/block}
+    </div>
+    <span id="{$loopsid|escape}-delete" class="input-group-btn">
+        {block 'delete'}
+            <button class="btn btn-warning" type="button" onclick="jQuery({"#$loopsid-holder"|json_encode|escape}).html(jQuery({"#$loopsid-default"|json_encode|escape}).html()); jQuery(this).prop('disabled', true).blur(); jQuery({"input[id^='$loopsid-input-']"|json_encode|escape}).val('').prop('disabled', true);"{if !$value} disabled{/if}>{block 'deletecaption'}Clear{/block}</button>
+        {/block}
+    </span>
+</div>
+
+<div id="{$loopsid}-wrapper" style="position: absolute; z-index: 5;">
+    <div id="{$entitylist->loopsid}"></div>
+</div>

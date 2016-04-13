@@ -1,0 +1,6 @@
+{foreach from=$elements key=key item=item}
+    <label class="radio-inline">
+        <input type="radio" id="{$loopsid}-input-{$key|escape:"urlpathinfo"}" name="{$name|escape}" value="{$key|escape}"{if (string)$key === (string)$value} checked{/if}>
+        {$item|escape}
+    </label>
+{/foreach}

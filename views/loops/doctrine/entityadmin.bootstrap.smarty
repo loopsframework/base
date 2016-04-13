@@ -1,0 +1,10 @@
+{extends "object.bootstrap.panel.smarty"}
+
+{block "heading"}
+        Entity Administrator of entity <span class="label label-success">{$loops->doctrine->entity_prefix}{$entity}</span>.
+        Current mode: <span class="label label-danger">{$mode}</span>
+{/block}
+
+{block "body"}
+    {include "loops/doctrine/entityadmin.smarty"}
+{/block}

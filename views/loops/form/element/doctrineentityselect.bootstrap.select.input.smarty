@@ -1,0 +1,8 @@
+<select id="{$loopsid}-input" name="{$name|escape}" class="form-control">
+    <option value=""></option>
+    {foreach from=$entitylist->paginator|iterator_to_array item=memotype}
+        {$k=$memotype->id}
+        {if $value}{$v=$value->id}{else}{$v=NULL}{/if}
+        <option value="{$k}"{if $value && $k == $v} selected{/if}>{$memotype->name|escape}</option>
+    {/foreach}
+</select>

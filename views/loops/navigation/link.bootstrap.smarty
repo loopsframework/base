@@ -1,0 +1,7 @@
+<li id="{$loopsid|escape}">
+    {if $newtab}
+        <a href="{$link|escape}" target="_blank">{$title|escape}</a>
+    {else}
+        <a href="{$link|escape}">{$title|escape}</a>
+    {/if}
+</li>

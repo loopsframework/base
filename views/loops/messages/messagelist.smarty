@@ -1,0 +1,3 @@
+{foreach from=$this item=message}
+    {$message|render}
+{/foreach}

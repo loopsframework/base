@@ -1,0 +1,30 @@
+{extends 'loops/page.bootstrap.smarty'}
+
+{block 'header'}
+    <h1>Whooops!</h1>
+    <p>I caught an exception. Can I keep it?</p>
+    <hr>
+{/block}
+
+{block 'script'}
+{/block}
+
+{block 'content'}
+    {block 'message'}
+        <h2>{$this|get_class}</h2>
+        <p>{$this->getMessage()}</p>
+    {/block}
+    
+    {block 'location'}
+        <h3>Location:</h3>
+        <p>
+            Line {$this->getLine()}<br>
+            {$this->getFile()}<br>
+        </p>
+    {/block}
+    
+    {block 'trace'}
+        <h3>Trace:</h3>
+        <pre>{$this->getTraceAsString()}</pre>
+    {/block}
+{/block}

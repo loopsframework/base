@@ -1,0 +1,3 @@
+<div class="checkbox">
+    <label><input type="checkbox" name="{$name}" id="{$loopsid}-input" value="yes"{if $value} checked{/if}> ON</label>
+</div>

@@ -1,0 +1,5 @@
+<thead>
+    <tr>
+        {$this|render:"th":TRUE}
+    </tr>
+</thead>

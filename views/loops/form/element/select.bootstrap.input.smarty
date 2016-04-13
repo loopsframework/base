@@ -1,0 +1,5 @@
+<select id="{$loopsid}-input" name="{$name|escape}{if $multiple}[]{/if}" class="form-control"{if $multiple} multiple{/if}>
+    {foreach from=$elements key=key item=item}
+        <option id="{$loopsid}-input-{$key|escape:"urlpathinfo"}" value="{$key|escape}"{if (string)$key === (string)$value} selected{/if}>{$item|escape}</option>
+    {/foreach}
+</select>

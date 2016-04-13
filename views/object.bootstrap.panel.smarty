@@ -1,0 +1,13 @@
+<div class="panel panel-default"{if $this instanceof Loops\ElementInterface} id="{$this->loopsid}"{/if}>
+    <div class="panel-heading">
+        {if $loops->request->isAjax()}<span class="label label-primary">Ajax</span>{/if}
+        {block 'heading'}
+            <span class="label label-default">{$this|get_class}</span>{if $this instanceof Loops\ElementInterface} {$this->loopsid}{/if}
+        {/block}
+    </div>
+    <div class="panel-body">
+        {block 'body'}
+            {$this|render:"":"panel"}
+        {/block}
+    </div>
+</div>

@@ -1,0 +1,47 @@
+<div id="{$loopsid}-list">
+    {foreach from=$subform->getFormElements() key=key item=element}
+        <div id="{$loopsid}-holder-{$key}" class="input-group" style="margin-bottom: 10px">
+            <span class="input-group-addon sortable-handle" style="cursor: move"></span>
+            {$element|render:"input"}
+            <span class="input-group-btn">
+                <button type="button" onclick="jQuery('#{$loopsid}-holder-{$key}').remove()" class="btn btn-danger">Delete</button>
+            </span>
+        </div>
+        {$element->messages|render:"bootstrap":TRUE}
+    {/foreach}
+</div>
+<div class="clearfix">
+    <button id="{$loopsid}-add" type="button" class="btn btn-default pull-right">Add Element</button>
+</div>
+<div id="{$loopsid}-template" class="hidden">
+    <div class="input-group" style="margin-bottom: 10px">
+        <span class="input-group-addon sortable-handle" style="cursor: move"></span>
+        <span class="replace"></span>
+        <span class="input-group-btn">
+            <button type="button" class="btn btn-danger">Delete</button>
+        </span>
+    </div>
+</div>
+<script>
+    jQuery(function() {
+        var add      = jQuery('#{$loopsid}-add');
+        var list     = jQuery('#{$loopsid}-list');
+        var template = jQuery('#{$loopsid}-template');
+        
+        {if empty($disablesort)}list.sortable( { handle: '.sortable-handle' } );{/if}
+        
+        add.click(function(e) {
+            jQuery.ajax({
+                url     : '{$domain}{$pagepath}/newelement',
+                type    : 'GET',
+                success : function(data, response, jqxhr) {
+                    var element = template.children().first().clone();
+                    element.find('button').click(function() { element.remove(); });
+                    element.find('.replace').replaceWith(jQuery.parseHTML(data, null, true));
+                    element.find('input').addClass('form-control');
+                    list.append(element);
+                }
+            });
+        });
+    });
+</script>

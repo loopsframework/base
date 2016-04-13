@@ -1,0 +1,13 @@
+<div class="panel panel-primary">
+    {if !empty($filterform) && $filterform->getFormElements()}
+        <div class="panel-body">
+            {$this->filterform|render:"":"panel"}
+        </div>
+    {/if}
+    {$paginator|render:"":"panel":["entityselect",$entity|strtolower]}
+    {if $limit > 0 && $paginator|count > 0}
+        <div class="panel-body">
+            {$this|render:"pager":"panel"}
+        </div>
+    {/if}
+</div>

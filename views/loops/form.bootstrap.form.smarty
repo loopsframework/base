@@ -1,0 +1,5 @@
+{foreach from=$this->getFormElements() item=element}
+    {$element|render:"":"form"}
+{/foreach}
+{$messages|render:"":"form"}
+{$this|render:"buttons"}

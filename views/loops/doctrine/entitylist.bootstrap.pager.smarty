@@ -1,0 +1,37 @@
+{if $limit > 0}
+    {$urlbase_page="`$domain``$pagepath`/page/"}
+    {$string_pager_left=$string_pager_left|default:"«"}
+    {$string_pager_right=$string_pager_right|default:"»"}
+    {$string_separator=$string_pager_separator|default:"…"}
+    {$next=($page+1)|min:$last_page}
+    {$before=($page-1)|max:1}
+    <ul class="pagination">
+        {math assign=from equation="max($page-max(3, $page-$last_page+7), 2)"}
+        {math assign=to   equation="min($from+7, $last_page)"}
+        {if $before != $page}<li><a href="{$urlbase_page}{$before}">{$string_pager_left}</a></li>{else}<li class="disabled"><a>{$string_pager_left}</a></li>{/if}
+    
+        {if $page==1 || !$total}<li class="active"><a>1</a></li>{else}<li><a href="{$urlbase_page}1">1</a></li>{/if}
+    
+        {if $page > 5 && $last_page > 9}<li class="disabled"><a>{$string_separator}</a></li>{/if}
+    
+        {section name=pager start=$from loop=$to}
+            {if $smarty.section.pager.index == $page}
+                <li class="active"><a>{$smarty.section.pager.index}</a></li>
+            {else}
+                <li><a href="{$urlbase_page}{$smarty.section.pager.index}">{$smarty.section.pager.index}</a></li>
+            {/if}
+        {/section}
+    
+        {if $page < $last_page-4 && $last_page > 8}<li class="disabled"><a>{$string_separator}</a></li>{/if}
+    
+        {if $total && $last_page != 1}
+            {if $page==$last_page}
+                <li class="active"><a>{$last_page}</a></li>
+            {else}
+                <li><a href="{$urlbase_page}{$last_page}">{$last_page}</a></li>
+            {/if}
+        {/if}
+    
+        {if $next != $page && $next}<li><a href="{$urlbase_page}{$next}">{$string_pager_right}</a></li>{else}<li class="disabled"><a>{$string_pager_right}</a></li>{/if}
+    </ul>
+{/if}

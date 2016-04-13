@@ -1,0 +1,29 @@
+#!/usr/bin/env php
+<?php
+/**
+ * This file is part of the Loops framework.
+ *
+ * @author Lukas <lukas@loopsframework.com>
+ * @license https://raw.githubusercontent.com/loopsframework/base/master/LICENSE
+ * @link https://github.com/loopsframework/base
+ * @link https://loopsframework.com/
+ * @version 0.1
+ */
+
+use Loops\Misc;
+use Loops\Application\LoopsAdmin;
+
+try {
+    set_time_limit(0);
+    
+    $root_dir = realpath(__DIR__."/../../../..");
+    
+    require_once("$root_dir/vendor/autoload.php");
+    
+    $app = new LoopsAdmin("$root_dir/app", $_SERVER["argv"]);
+    exit((int)$app->run());
+}
+catch(Exception $e) {
+    Misc::displayException($e, FALSE);
+    exit(1);
+}

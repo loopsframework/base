@@ -1,0 +1,6 @@
+<div class="form-group" id="{$loopsid}">
+    <label for="{$loopsid}-input">{$label|default:$name|escape}</label>
+    {if $description}<p class="help-block">{$description|escape|nl2br}</p>{/if}
+    {$this|render:"input"}
+    {$messages|render:"bootstrap":TRUE}
+</div>

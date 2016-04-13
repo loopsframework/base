@@ -1,0 +1,11 @@
+{if $submitted}
+    {$this|render:"submitted"}
+{elseif $confirmed}
+    <form method="POST" action="{$domain}{$pagepath}/submit{$query}">
+        {$this|render:"confirmed"}
+    </form>
+{else}
+    <form method="POST" action="{$domain}{$pagepath}/{if $no_confirm}submit{else}confirm{/if}{$query}">
+        {$this|render:"form"}
+    </form>
+{/if}

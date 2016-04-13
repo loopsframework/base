@@ -1,0 +1,2 @@
+<input id="{$loopsid|escape}" name="{$name|escape}" type="hidden" value="{$token}">
+{$messages|render}

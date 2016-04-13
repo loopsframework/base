@@ -1,0 +1,1 @@
+<input id="{$loopsid}-input" type="date" data-date="{'{"startView": 2, "openOnMouseFocus": true}'|escape}" name="{$name}"{if $value} value="{$value->format("Y-m-d")|escape}"{/if} class="form-control">

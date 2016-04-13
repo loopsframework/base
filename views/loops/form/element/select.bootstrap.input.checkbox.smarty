@@ -1,0 +1,8 @@
+{foreach from=$elements key=key item=item}
+    <div class="checkbox">
+        <label>
+            <input type="checkbox" id="{$loopsid}-input-{$key|escape:"urlpathinfo"}" name="{$name|escape}[]" value="{$key|escape}"{if $key|in_array:$value} checked{/if}>
+            {$item|escape}
+        </label>
+    </div>
+{/foreach}

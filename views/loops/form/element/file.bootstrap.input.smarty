@@ -1,0 +1,175 @@
+<div class="input-group">
+    <input type="hidden" id="{$loopsid}-hidden" name="{$name}" value="{$filename|escape}">
+    <div class="form-control" id="{$loopsid}-text">
+        {if $filename}
+            <a target="_blank" href="{$domain}{$pagepath}/download/{$filename|escape}">{$filename|escape}</a>
+        {else}
+            {"No file selected"|tr|escape}
+        {/if}
+    </div>
+    <span class="input-group-btn">
+        <div id="{$loopsid}-deletebutton" class="btn btn-primary btn-danger"{if !$filename} style="display: none"{/if}>
+            <span class="glyphicon glyphicon-remove"></span> {"Delete"|tr|escape}
+        </div>
+        <div id="{$loopsid}-cancelbutton" class="btn btn-primary btn-danger" style="display: none">
+            <span class="glyphicon glyphicon-remove"></span> {"Cancel"|tr|escape}
+        </div>
+        <div id="{$loopsid}-button" class="btn btn-primary btn-file" style="position: relative;">
+            <span class="glyphicon glyphicon-folder-open"></span> {"Browse..."|tr|escape}
+            <input id="{$loopsid}-fileselect" style="position:absolute;top:0;left:0;width:100%;height:100%;opacity: 0;cursor:inherit;" type="file">
+        </div>
+    </span>
+</div>
+<script>
+    jQuery(function(){
+        var xhr;
+        var fileselect       = jQuery("#{$loopsid}-fileselect");
+        var text             = jQuery("#{$loopsid}-text");
+        var button           = jQuery("#{$loopsid}-button");
+        var deletebutton     = jQuery("#{$loopsid}-deletebutton");
+        var cancelbutton     = jQuery("#{$loopsid}-cancelbutton");
+        var hidden           = jQuery("#{$loopsid}-hidden");
+        var hasfile          = {if $this->file}true{else}false{/if};
+        var uploading        = false;
+        var deleting         = false;
+        var aborted          = false;
+        var progressbar;
+        var fileselect_clone;
+        
+        function show_error(xhr, type, error) {
+            var obj;
+            try {
+                obj = jQuery.parseJSON(xhr.responseText);
+            } catch(e) {
+                obj = false;
+            }
+            
+            if (obj && obj.error) {
+                error = obj.error;
+            }
+
+            text.html('<div class="text-danger">'+(xhr && xhr.status ? xhr.status+' ' : '')+(aborted ? {"Aborted"|tr|json_encode} : error)+'</div>');
+        }
+        
+        function update_buttons() {
+            button.attr('disabled', uploading || deleting);
+            fileselect.attr('disabled', uploading || deleting);
+            deletebutton.css('display', hasfile ? 'inline-block' : 'none');
+            deletebutton.attr('disabled', uploading || deleting);
+            cancelbutton.css('display', uploading ? 'inline-block' : 'none');
+        }
+        
+        fileselect.change(function(e) {
+            function custom_xhr() {
+                var xhr = jQuery.ajaxSettings.xhr();
+                if(xhr.upload) {
+                    xhr.upload.addEventListener('progress', function(e) {
+                        if(e.lengthComputable){
+                            progressbar.css('width', (e.loaded*100/e.total)+'%' );
+                        }
+                    }, false);
+                }
+                return xhr;
+            }
+            
+            function upload_started() {
+                progress = jQuery('<div class="progress"><div class="progress-bar" role="progressbar"></div></div>');
+                text.empty();
+                text.append(progress);
+                progressbar = text.find('.progress-bar');
+                
+                var new_fileselect = fileselect_clone.clone(true);
+                fileselect.replaceWith(new_fileselect);
+                fileselect = new_fileselect;
+                fileselect.disabled = true;
+                
+                uploading = true;
+                aborted   = false;
+                update_buttons();
+            }
+            
+            function upload_finished() {
+                uploading = false;
+                update_buttons();
+            }
+            
+            function upload_success(result) {
+                if(result && result.success) {
+                    text.html('<a href="{$domain}{$pagepath}/download/'+encodeURIComponent(file.name)+'">'+file.name+'</a>');
+                    hidden.val(file.name);
+                    hasfile = true;
+                    jQuery("#{$loopsid}").trigger('upload');
+                }
+                else if(result && !result.success && result.error) {
+                    show_error(null, null, result.error);
+                }
+                else {
+                    show_error(null, null, {"Unknown error."|tr|json_encode});
+                }
+            }
+        
+            var postdata = new FormData();
+            var file = fileselect[0].files[0];
+            postdata.append('form', file);
+            
+            xhr = jQuery.ajax({
+                url: '{$domain}{$pagepath}/upload',
+                type: 'POST',
+                data: postdata,
+                xhr: custom_xhr,
+                beforeSend: upload_started,
+                success: upload_success,
+                error: show_error,
+                complete: upload_finished,
+                contentType: false,
+                processData: false
+            });
+        });
+        
+        cancelbutton.click(function(e) {
+            aborted = true;
+            xhr.abort();
+        });
+        
+        deletebutton.click(function(e) {
+            if(!confirm({"Do you want to delete the uploaded file?"|tr|json_encode})) return;
+            
+            function delete_started() {
+                deleting = true;
+                update_buttons();
+            }
+            
+            function delete_success(result) {
+                if(result && result.success) {
+                    text.html({"No file selected"|tr|json_encode});
+                    hidden.val('');
+                    hasfile = false;
+                    jQuery("#{$loopsid}").trigger('delete');
+                }
+                else if(result && !result.success && result.error) {
+                    show_error(null, null, result.error);
+                }
+                else {
+                    show_error(null, null, {"Unknown error."|tr|json_encode});
+                }
+            }
+            
+            function delete_finished() {
+                deleting = false;
+                update_buttons();
+            }
+            
+            xhr = jQuery.ajax({
+                url: '{$domain}{$pagepath}/delete',
+                type: 'POST',
+                data: {},
+                beforeSend: delete_started,
+                success: delete_success,
+                complete: delete_finished,
+                error: show_error
+            });
+        });
+        
+        fileselect_clone = fileselect.clone(true);
+    });
+</script>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        {block 'meta'}
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <meta charset="utf-8">
+        {/block}
+        {block 'head'}
+            <title>{block 'title'}{$domain}{if !empty($pagepath)}{$pagepath|escape}{/if}{if !empty($loopsid)} - {$loopsid|escape}{/if}{/block}</title>
+        {/block}
+        {block 'css'}
+            <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/css/bootstrap.min.css" type="text/css" />
+            <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/css/bootstrap-theme.min.css" type="text/css" />
+            <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.css" type="text/css" />
+        {/block}
+        {block 'js'}
+            <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/mootools/1.5.1/mootools-core-full-nocompat.min.js"></script>
+            <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+            <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+            <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/js/bootstrap.min.js"></script>
+            <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/webshim/1.15.7/dev/polyfiller.js"></script>
+        {/block}
+    </head>
+    <body>
+        {block 'script'}
+            {include "loops/page.bootstrap.js.compat.smarty"}
+            {include "loops/page.bootstrap.js.loops.smarty"}
+        {/block}
+        <div{if !empty($loopsid)} id="{$loopsid}"{/if} class="container">
+            {block 'header'}
+                <h1>
+                    <span class="label label-success">{$this|get_class}</span>
+                    {$domain}{if !empty($pagepath)}{$pagepath|escape}{/if}
+                    {if !empty($loopsid)}
+                        <small>{$loopsid|escape}</small>
+                    {/if}
+                </h1>
+                <hr>
+            {/block}
+            {block 'content'}
+                <div class="row">
+                    <div class="col-md-12">
+                        {include "object.bootstrap.smarty"}
+                    </div>
+                </div>
+            {/block}
+            {block 'footer'}
+                <hr>
+                <div class="row">
+                    <div class="col-xs-8">
+                        Powered by:
+                        {if !empty($smarty.server.SERVER_SOFTWARE)}
+                            <span class="label label-default">{$smarty.server.SERVER_SOFTWARE}</span>
+                        {/if}
+                        <span class="label label-default">PHP {$smarty.const.PHP_VERSION}</span>
+                        <span class="label label-default">Loops {Loops::VERSION}</span>
+                        <span class="label label-default">Smarty {$smarty.version}</span>
+                    </div>
+                    <div class="col-xs-4">
+                        <div class="text-right">
+                            Processing time:
+                            <span class="label label-success">{(((TRUE|microtime)-($smarty.server.REQUEST_TIME_FLOAT))*1000)|number_format:3} ms</span>
+                        </div>
+                        <div class="text-right">
+                            Memory peak usage:
+                            <span class="label label-warning">{((FALSE|memory_get_peak_usage)/1024/1024)|number_format:2} MB</span>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+            {/block}
+        </div>
+    </body>
+</html>

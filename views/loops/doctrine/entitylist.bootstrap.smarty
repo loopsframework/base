@@ -1,0 +1,3 @@
+{$this|render:"pager"}
+{$paginator|render}
+{$this|render:"pager"}

@@ -1,0 +1,3 @@
+<li id="{$loopsid|escape}"{if $highlight} class="active"{/if}>
+    <a href="{$domain}{$link|escape}">{$title|escape}</a>
+</li>

@@ -1,0 +1,6 @@
+<script>
+    jQuery(function() {
+        loops.ajaxify('{$loopsid}');
+    });
+</script>
+{$this|render:"bootstrap.panel"}

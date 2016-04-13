@@ -1,0 +1,25 @@
+# This file is part of the Loops framework.
+#
+# @author Lukas <lukas@loopsframework.com>
+# @license https://raw.githubusercontent.com/loopsframework/base/master/LICENSE
+# @link https://github.com/loopsframework/base
+# @link https://loopsframework.com/
+# @version 0.1
+#
+# An example for a simple Loops setup via docker
+#
+
+phpfpm:
+  image: php:5-fpm
+  volumes:
+    - ./html:/var/www/html
+  
+nginx:
+  image: "nginx"
+  ports:
+    - "80:80"
+  volumes:
+    - ./html:/var/www/html
+    - ./nginx.conf:/etc/nginx/conf.d/default.conf
+  links:
+    - phpfpm

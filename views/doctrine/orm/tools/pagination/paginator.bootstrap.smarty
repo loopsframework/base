@@ -1,0 +1,16 @@
+{$this->getQuery()|render}
+
+{$result=$this|iterator_to_array}
+
+{if $result|count}
+    <table class="table table-condensed table-striped">
+        {$result.0|render:"thead":TRUE}
+        <tbody>
+            {foreach from=$result item=item}
+                {$item|render:"tr":TRUE}
+            {/foreach}
+        </tbody>
+    </table>
+{else}
+    <div class="alert alert-warning">Empty result.</div>
+{/if}

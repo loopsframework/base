@@ -1,0 +1,24 @@
+{
+    "name": "loopsframework/loops",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": { "": "src/" }
+    },
+    "require": {
+        "smarty/smarty": "^3",
+        "doctrine/orm": "^2.5",
+        "donatj/flags": "^1"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^5"
+    },
+    "bin": [
+        "bin/loops"
+    ],
+    "authors": [
+        {
+            "name": "Lukas",
+            "email": "lukas@loopsframework.com"
+        }
+    ]
+}

@@ -1,0 +1,3 @@
+<li id="{$loopsid|escape}">
+    <a href="{$link|escape}">{$title|escape}</a>
+</li>

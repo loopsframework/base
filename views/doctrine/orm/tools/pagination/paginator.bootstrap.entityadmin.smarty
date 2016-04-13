@@ -1,0 +1,33 @@
+{$this->getQuery()|render:"":"":"entityadmin"}
+
+{$result=$this|iterator_to_array}
+
+{if $result|count}
+    <table class="table table-condensed table-striped">
+        <thead>
+            <tr>
+                {$classname=$result.0|get_class}
+                {foreach from=$result.0 item=item key=key}
+                    <th>{$loops->getService("annotations")->get($classname)->properties->$key->findFirst('Form\Element')->arguments.label|default:$key}</th>
+                {/foreach}
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {foreach from=$result item=item}
+                <tr>
+                    {$item|render:"td":TRUE}
+                    {$identifier=$loops->database->metadata($item)->getIdentifierValues($item)}
+                    <td class="text-right">
+                        <form method="POST" onsubmit="return confirm({"Do you want to delete the entity of type '{$item|get_class}' with id '{","|implode:$identifier}'?"|json_encode|escape})" action="{$domain}{$stack.2->getPagePath()}/delete/{"/"|implode:$identifier}{$query}">
+                            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                            <a class="btn btn-sm btn-primary" href="{$domain}{$stack.1->pagepath}/edit/{"/"|implode:$identifier}">Edit</a>
+                        </form>
+                    </td>
+                </tr>
+            {/foreach}
+        </tbody>
+    </table>
+{else}
+    <div class="alert alert-warning">Empty result.</div>
+{/if}

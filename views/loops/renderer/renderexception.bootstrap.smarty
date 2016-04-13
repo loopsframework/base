@@ -1,0 +1,31 @@
+{extends "exception.bootstrap.smarty"}
+
+{block 'message' append}
+    <p>
+        Proposed template filename(s):
+        <ul>
+            {foreach from=$proposed_template_names item=proposed}
+                <li><big><i>.../{$proposed|escape}</i></big></li>
+            {/foreach}
+        </ul>
+        
+        {if !$custom_template && !"bootstrap"|in_array:$appearances}
+            You might also try to render your objects with the <span class="label label-danger">bootstrap</span> appearance.
+        {/if}
+    </p>
+    
+    <h3>Render Appearances:</h3>
+    
+    <p>
+        {foreach from=$appearances|array_merge:$forced_appearances|array_unique item=appearance}
+            <span class="label label-{if $appearance|in_array:$forced_appearances}danger{else}success{/if}">{$appearance|escape}</span>
+        {foreachelse}
+            <span class="label label-warning">None</span>
+        {/foreach}
+        
+        <br>
+        <br>
+        
+        <i class="text-muted">Appearances in green are optional appearances.</i>
+    </p>
+{/block}

@@ -1,0 +1,24 @@
+<table class="table table-bordered">
+    {foreach from=$this->getForm()->elements key=key item=element}
+        {$value=$this->offsetGet($key)}
+        <tr>
+            <td class="active text-right">
+                <div class="pull-left">
+                    {$element->label|default:$key|escape}
+                </div>
+                <span class="label label-default">
+                    {if $value|is_object}{$value|get_class|escape}{else}{$value|gettype}{/if}
+                </span>
+            </td>
+            <td>
+                {$value|render:"bootstrap":"":TRUE}
+            </td>
+        </tr>
+    {foreachelse}
+        <tr>
+            <td class="text-center">
+                <span class="label label-info">No Properties</span>
+            </td>
+        </tr>
+    {/foreach}
+</table>

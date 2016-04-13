@@ -1,0 +1,11 @@
+{$severities.0="danger"}
+{$severities.1="danger"}
+{$severities.2="danger"}
+{$severities.3="danger"}
+{$severities.4="warning"}
+{$severities.5="success"}
+{$severities.6="info"}
+{$severities.7="info"}
+<div class="alert alert-{if $severity <= 3}danger{elseif $severity <= 4}warning{elseif $severity <= 5}warning{else}info{/if}">
+    {if $severity <= 2}<b>{/if}{$message|escape|nl2br}{if $severity < 2}</b>{/if}
+</div>

@@ -1,0 +1,2 @@
+<a class="btn btn-default" href="{$domain}{$pagepath}/back{$query}">Back</a>
+<button class="btn btn-default">Submit</button>

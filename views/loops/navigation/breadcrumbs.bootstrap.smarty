@@ -1,0 +1,12 @@
+{$breadcrumbs=$this->getEntries()|iterator_to_array}
+{if $breadcrumbs}
+    <ol class="breadcrumb">
+        {foreach from=$breadcrumbs item=entry name=bc}
+            {if $smarty.foreach.bc.last || !$entry->link}
+                <li class="active">{$entry->title|escape}</li>
+            {else}
+                <li class="active"><a href="{$domain}{$entry->link|escape}">{$entry->title|escape}</a></li>
+            {/if}
+        {/foreach}
+    </ol>
+{/if}

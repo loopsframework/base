@@ -1,0 +1,3 @@
+{$this->getFormValue(TRUE)|render:"":"":"form.confirmed"}
+{$messages|render:"":"":"form.confirmed"}
+{$this|render:"buttons"}

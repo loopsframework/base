@@ -1,0 +1,10 @@
+{if $mode == "add"}
+    {$this->add|render:"":"":[$entity|strtolower,"entityadmin"]}
+{elseif $mode == "edit"}
+    {$this->edit|render:"":"":[$entity|strtolower,"entityadmin"]}
+{else}
+    {if $persist}
+        {$this|render:"addbutton":[]:[$entity|strtolower,"entityadmin"]}
+    {/if}
+    {$this->list|render:"":"":[$entity|strtolower,"entityadmin"]}
+{/if}

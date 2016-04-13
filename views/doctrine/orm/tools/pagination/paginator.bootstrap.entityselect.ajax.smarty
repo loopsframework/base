@@ -1,0 +1,21 @@
+{$this->getQuery()|render:"":"":"entityselect"}
+
+{$result=$this|iterator_to_array}
+
+{if $result|count}
+    {$loopsid=$stack.1->loopsid}
+    <table class="table table-hover">
+        <tbody>
+            {foreach from=$result key=key item=item}
+                {$identifier=$loops->database->metadata($item)->getIdentifierValues($item)}
+                <tr>
+                    <td id="{$loopsid}-{$key}" style="vertical-align: middle; cursor: pointer;" onclick="jQuery('#{$loopsid|escape}').trigger('set', [{$identifier|json_encode|escape}, {$key|json_encode|escape}])">
+                        {$item|render:TRUE}
+                    </td>
+                </tr>
+            {/foreach}
+        </tbody>
+    </table>
+{else}
+    <div class="alert alert-warning">Empty result.</div>
+{/if}

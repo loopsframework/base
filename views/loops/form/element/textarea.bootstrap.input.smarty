@@ -1,0 +1,1 @@
+<textarea id="{$loopsid}-input" name="{$name}" class="form-control" placeholder="{$placeholder|escape}">{$value|escape}</textarea>

@@ -1,0 +1,3 @@
+{foreach from=$this key=key item=item}
+    <th>{$key|escape}</th>
+{/foreach}

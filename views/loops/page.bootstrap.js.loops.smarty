@@ -1,0 +1,71 @@
+<script>
+    var loops = {
+        ajaxified: [],
+        
+        ajaxSuccess: function(data, response, jqxhr) {
+            var loopsid = jqxhr.getResponseHeader('X-Loops-ID');
+            var new_el = null;
+            var new_el_data = jQuery(jQuery.parseHTML(data, null, true));
+            var old_el = jQuery('#'+loopsid);
+            if(new_el_data.length) {
+                if(new_el_data.attr('id') == loopsid) {
+                    new_el = new_el_data;
+                }
+                else {
+                    new_el = new_el_data.find('#'+loopsid);
+                }
+            }
+            if(new_el && new_el.length) {
+                old_el.html(new_el.contents());
+            }
+            else {
+                old_el.html(data);
+            }
+            old_el.trigger('loopsreplaced');
+        },
+        
+        ajaxifyElement: function(element, type, callback) {
+            var ajaxified = this.ajaxified;
+            
+            element.each(function(index, element) {
+                if(jQuery.inArray(element, ajaxified) < 0) {
+                    ajaxified.push(element);
+                    jQuery(element).on(type, { element: element }, callback);
+                }
+            });
+        },
+        
+        ajaxifyForm: function(form) {
+            this.ajaxifyElement(form, 'submit', function formCallback(event) {
+                var form = jQuery(event.data.element);
+                event.preventDefault();
+                jQuery.ajax({
+                    url     : form.attr('action'),
+                    type    : form.attr('method'),
+                    data    : form.serialize(),
+                    success : loops.ajaxSuccess
+                });
+            });
+        },
+        
+        ajaxifyLink: function(link) {
+            this.ajaxifyElement(link, 'click', function(event) {
+                var url = jQuery(event.data.element).attr('href');
+                if(!url || !url.length || url[0] == '#' || url.substring(0, 11) == 'javascript:') return;
+                event.preventDefault();
+                jQuery.ajax({
+                    url     : url,
+                    type    : 'GET',
+                    success : loops.ajaxSuccess
+                });
+            });
+        },
+        
+        ajaxify: function(loopsid) {
+            var element = jQuery('#'+loopsid);
+            if(!element) return;
+            loops.ajaxifyForm(element.find('form'));
+            loops.ajaxifyLink(element.find('a:not([target])'));
+        }
+    };
+</script>

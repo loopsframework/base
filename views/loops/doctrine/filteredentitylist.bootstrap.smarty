@@ -1,0 +1,6 @@
+{$this|render:"pager"}
+{if $filterform->getFormElements()}
+    {$filterform|render}
+{/if}
+{$paginator|render}
+{$this|render:"pager"}

@@ -1,0 +1,5 @@
+<ul id="{$loopsid|escape}" class="nav nav-tabs" role="tablist">{*
+  *}{foreach from=$this->getEntries() item=entry}{*
+      *}{$entry|render}{*
+  *}{/foreach}{*
+ *}</ul>

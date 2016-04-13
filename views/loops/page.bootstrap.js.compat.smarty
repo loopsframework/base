@@ -1,0 +1,9 @@
+<script>
+    if(typeof jQuery != 'undefined') {
+        jQuery.noConflict();
+    }
+    
+    if(typeof webshim != 'undefined') {
+        webshim.polyfill('forms forms-ext');
+    }
+</script>
