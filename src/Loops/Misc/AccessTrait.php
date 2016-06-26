@@ -310,6 +310,8 @@ trait AccessTrait {
             
             if($property->isPublic()) {
                 $name = $property->getName();
+                $result["getter"][$name]  = $name;
+                $result["setter"][$name]  = $name;
                 $result["exposed"][$name] = $name;
             }
             
