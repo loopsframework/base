@@ -20,6 +20,7 @@ use Loops\Form;
 use Loops\Annotations\Listen;
 use Loops\Form\Element\DoctrineEntitySelect;
 use Loops\Form\Element\Text;
+use Loops\Form\Element\TextArea;
 use Loops\Form\Element\Number;
 use Loops\Form\Element\Validator\NotNull;
 use Loops\Form\Element\Validator\Length;
@@ -71,6 +72,10 @@ class EntityForm extends Form {
         }
         
         foreach($missing_fields as $name) {
+            if(!empty($metadata->fieldMappings[$name]['id'])) {
+                continue;
+            }
+
             $elements[$name] = self::addMissingElement($form, $entity, $loops, $name, $metadata->fieldMappings[$name], $properties->$name, $filter, FALSE);
             
             if(!$form->value->offsetExists($name)) {
@@ -168,6 +173,9 @@ class EntityForm extends Form {
     private static function createElementFromMetadata($form, $loops, $metadata, $default) {
         if($metadata["type"] == "string") {
             $element = new Text($default, [], [], $form, $loops);
+        }
+        elseif($metadata["type"] == "text") {
+            $element = new TextArea($default, [], [], $form, $loops);
         }
         elseif($metadata["type"] == "integer") {
             $element = new Number($default, [], [], $form, $loops);
