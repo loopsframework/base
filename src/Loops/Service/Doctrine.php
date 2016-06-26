@@ -11,6 +11,7 @@
 
 namespace Loops\Service;
 
+use Doctrine\Common\Annotations\SimpleAnnotationReader;
 use Doctrine\ORM\Tools\Setup;
 use Doctrine\ORM\EntityManager;
 use Loops;
