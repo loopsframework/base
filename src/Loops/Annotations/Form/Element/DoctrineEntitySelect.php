@@ -11,6 +11,7 @@
 
 namespace Loops\Annotations\Form\Element;
 
+use Loops;
 use Loops\Annotations\Object;
 use Loops\Annotations\Form\Element;
 use Loops\Doctrine\FilteredEntityList;
@@ -51,7 +52,7 @@ class DoctrineEntitySelect extends Element {
      */
     public $order = [];
     
-    public function factory($context = NULL, $loops = NULL) {
+    public function factory($context = NULL, Loops $loops = NULL) {
         $entitylist = new FilteredEntityList($this->entity, $this->filter, $this->fields, $this->limit, $this->alias, $this->order, $context, $loops);
         $this->arguments["entitylist"] = $entitylist;
         return parent::factory($context, $loops);

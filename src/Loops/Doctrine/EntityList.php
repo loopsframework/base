@@ -20,6 +20,7 @@ use Loops\Annotations\Access\Expose;
 use Loops\Annotations\Session\SessionVar;
 use Loops\Annotations\Event\Renderer\onRender;
 use Loops\Element;
+use Loops\Exception;
 use Loops\Session\SessionTrait;
 
 class EntityList extends Element {

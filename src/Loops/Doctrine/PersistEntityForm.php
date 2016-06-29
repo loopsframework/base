@@ -30,7 +30,8 @@ class PersistEntityForm extends EntityForm {
      */
     public function detachEntityFromValue($value) {
         $entity = $value->offsetGet("value");
-        $this->getLoops()->getService("doctrine")->detach($entity);
+        $doctrine = $this->getLoops()->getService("doctrine");
+        $doctrine->detach($entity);
     }
 
     /**

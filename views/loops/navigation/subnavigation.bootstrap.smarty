@@ -1,7 +1,7 @@
 <li id="{$loopsid|escape}" class="dropdown{if $highlight} active{/if}">
     <a class="dropdown-toggle" data-toggle="dropdown" href="{$domain}{$link}">{$title|escape} <span class="caret"></span></a>
     <ul class="dropdown-menu" role="menu">{*
-        *}{foreach from=$subnavigation->getChildren() item=entry}{*
+        *}{foreach from=$subnavigation->getEntries() item=entry}{*
             *}{$entry|render}{*
         *}{/foreach}{*
     *}</ul>

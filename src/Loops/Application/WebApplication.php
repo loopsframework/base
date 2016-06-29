@@ -11,8 +11,8 @@
 
 namespace Loops\Application;
 
+use Exception;
 use Loops\Annotations\Access\ReadOnly;
-use Loops\Exception;
 use Loops\Misc;
 use Loops\Application;
 use Loops\Http\Request;
