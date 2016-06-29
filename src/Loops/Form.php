@@ -727,9 +727,12 @@ class Form extends Element {
             
             $newvalue = $value->offsetGet($name);
             
-            $childvalue = $child->setValue($newvalue);
+            $child->setValue($newvalue);
             
             //check if child did some processing/initializing on object values - keep sync
+            
+            $childvalue = $child->getValue();
+            
             if($newvalue !== $childvalue) {
                 $value->offsetSet($name, $childvalue);
             }
