@@ -76,6 +76,11 @@ class EntityForm extends Form {
                 continue;
             }
 
+            if(!$entity->offsetExists($name)) {
+                $classname = get_class($entity);
+                throw new Exception("Failed to create Element for Entity '$classname'. Property '$name' is not accessible.");
+            }
+
             $elements[$name] = self::addMissingElement($form, $entity, $loops, $name, $metadata->fieldMappings[$name], $properties->$name, $filter, FALSE);
             
             if(!$form->value->offsetExists($name)) {
