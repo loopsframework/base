@@ -52,6 +52,8 @@ class Object {
     
     protected $include_in_arguments = [];
     
+    protected $conflict_prefix = "%_";
+
     private $delegating = FALSE;
     
     public function __construct($options) {
@@ -86,6 +88,21 @@ class Object {
         
         if(!$this->class) {
             throw new Exception("Target class not specified in annotation object (".get_class($this).").");
+        }
+
+        $classname = explode("\\", $this->class);
+        $classname = Misc::underscore(array_pop($classname));
+        $this->conflict_prefix = str_replace("%", $classname, $this->conflict_prefix);
+        
+        foreach($this->arguments as $key => $value) {
+            if(substr($key, 0, strlen($this->conflict_prefix)) == $this->conflict_prefix) {
+                $conflict = substr($key, strlen($this->conflict_prefix));
+    
+                if(property_exists($this, $conflict)) {
+                    unset($this->arguments[$key]);
+                    $this->arguments[$conflict] = $value;
+                }
+            }
         }
     }
 

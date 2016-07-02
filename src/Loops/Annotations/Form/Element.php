@@ -43,9 +43,4 @@ class Element extends Object {
      * @var string
      */
     protected $delegate_annotation_namespace = "Loops\Annotations\Form\Element\\";
-    
-    /**
-     * @var array<string>
-     */
-    protected $include_in_arguments = [ "filter" ];
 }
