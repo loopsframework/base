@@ -84,6 +84,11 @@ abstract class Element extends Object implements ElementInterface, CacheInterfac
      */
     protected $context;
     
+    /**
+     * Can be returned from action methods for convinience
+     */
+    const NO_OUTPUT = -1;
+
     private $__name           = NULL;
     private $__parent         = NULL;
     
