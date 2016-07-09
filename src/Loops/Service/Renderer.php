@@ -325,28 +325,28 @@ class Renderer extends Service {
             array_unshift($this->stack, $object);
         }
 
-        //prepare template variables
-        $vars = [];
-        
-        if(is_object($object) || is_array($object)) {
-            foreach($object as $key => $value) {
-                $vars[$key] = $value;
-            }
-        }
-        
-        $vars["this"]   = $object;
-        $vars["loops"]  = $loops = $this->getLoops();
-        $vars["stack"]  = $this->stack;
-        
-        if($loops->hasService("web_core")) {
-            $vars["domain"] = $loops->getService("web_core")->base_url;
-        }
-        
-        if($loops->hasService("request")) {
-            $vars["query"]  = $loops->getService("request")->getQuery();
-        }
-        
         try {
+            //prepare template variables
+            $vars = [];
+            
+            if(is_object($object) || is_array($object)) {
+                foreach($object as $key => $value) {
+                    $vars[$key] = $value;
+                }
+            }
+            
+            $vars["this"]   = $object;
+            $vars["loops"]  = $loops = $this->getLoops();
+            $vars["stack"]  = $this->stack;
+            
+            if($loops->hasService("web_core")) {
+                $vars["domain"] = $loops->getService("web_core")->base_url;
+            }
+            
+            if($loops->hasService("request")) {
+                $vars["query"]  = $loops->getService("request")->getQuery();
+            }
+        
             //get plugin from Loops Context
             $servicename = $plugin_name."_renderer";
             
@@ -362,17 +362,13 @@ class Renderer extends Service {
         
             $result = $plugin->render($folder, $file);
         }
-        catch(Exception $e) {
-            $this->stack = [];
-            $this->appearance_stack = [];
-            throw $e;
+        finally {
+            if($added) {
+                array_shift($this->stack);
+            }
+            
+            array_pop($this->appearance_stack);
         }
-
-        if($added) {
-            array_shift($this->stack);
-        }
-        
-        array_pop($this->appearance_stack);
 
         if($cache_key) {
             $cache->save($cache_key, $result);

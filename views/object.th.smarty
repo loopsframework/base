@@ -1,3 +1,4 @@
+{$classname=$this|get_class}
 {foreach from=$this key=key item=item}
-    <th>{$key|escape}</th>
+    <th>{$loops->getService("annotations")->get($classname)->properties->$key->findFirst('Form\Element')->arguments.label|default:$key}</th>
 {/foreach}

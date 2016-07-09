@@ -6,10 +6,7 @@
     <table class="table table-condensed table-striped">
         <thead>
             <tr>
-                {$classname=$result.0|get_class}
-                {foreach from=$result.0 item=item key=key}
-                    <th>{$loops->getService("annotations")->get($classname)->properties->$key->findFirst('Form\Element')->arguments.label|default:$key}</th>
-                {/foreach}
+                {$result.0|render:"th":TRUE}
                 <th></th>
             </tr>
         </thead>

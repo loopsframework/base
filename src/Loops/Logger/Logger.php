@@ -24,7 +24,7 @@ abstract class Logger extends Object implements LoggerInterface {
     public function __construct($severity = "NOTICE", $stderr_logging_cli = TRUE, Loops $loops = NULL) {
         parent::__construct($loops);
         
-        $this->severity = constant("Loops\Messages\Message::$severity");
+        $this->severity = is_string($severity) ? constant("Loops\Messages\Message::$severity") : $severity;
 
         if($stderr_logging_cli && php_sapi_name() == "cli") {
             $this->stderr_logger = $this->getLoops()->createService("logger", ArrayObject::fromArray(["plugin" => "Stderr"]), TRUE);
@@ -60,6 +60,8 @@ abstract class Logger extends Object implements LoggerInterface {
             case 'info':    return $this->severity >= Message::INFO;
             case 'debug':   return $this->severity >= Message::DEBUG;
         }
+
+        return parent::__get($key);
     }
     
     public function setSeverity($severity) {
