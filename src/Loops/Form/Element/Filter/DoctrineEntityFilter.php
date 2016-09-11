@@ -12,20 +12,21 @@
 namespace Loops\Form\Element\Filter;
 
 use Loops;
+use Loops\ArrayObject;
 use Loops\Form\Element\Filter;
 use Loops\Doctrine\EntityList;
 
 class DoctrineEntityFilter extends Filter {
     private $entity_list;
-    
+
     public function __construct(EntityList $entity_list, Loops $loops = NULL) {
         parent::__construct($loops);
-        
+
         $this->entity_list = $entity_list;
     }
-    
+
     public function filter($value) {
-        if(is_object($value)) {
+        if(is_object($value) && !($value instanceof ArrayObject)) {
             $doctrine = $this->getLoops()->getService("doctrine");
             $value = $doctrine->merge($value);
             $doctrine->refresh($value);
