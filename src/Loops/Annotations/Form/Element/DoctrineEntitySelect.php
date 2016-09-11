@@ -26,34 +26,39 @@ class DoctrineEntitySelect extends Element {
      * @Required
      */
     public $entity;
-    
+
     /**
      * @var string
      */
     public $class = "DoctrineEntitySelect";
-    
+
     /**
      * @var integer
      */
     public $limit = 10;
-    
+
     /**
      * @var string
      */
     public $alias;
-    
+
     /**
      * @var array<string>
      */
     public $fields = [];
-    
+
     /**
      * @var array<array<string>>
      */
     public $order = [];
-    
+
+    /**
+     * @var string|array<string>
+     */
+    public $filterform_filter;
+
     public function factory($context = NULL, Loops $loops = NULL) {
-        $entitylist = new FilteredEntityList($this->entity, $this->filter, $this->fields, $this->limit, $this->alias, $this->order, $context, $loops);
+        $entitylist = new FilteredEntityList($this->entity, $this->filterform_filter === NULL ? $this->filter : $this->filterform_filter, $this->fields, $this->limit, $this->alias, $this->order, $context, $loops);
         $this->arguments["entitylist"] = $entitylist;
         return parent::factory($context, $loops);
     }
