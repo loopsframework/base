@@ -1,0 +1,11 @@
+#!/bin/bash
+
+cd "${0%/*}"
+
+docker-compose -p loops build
+
+if [ $# == 0 ]; then
+    docker-compose -p loops run --rm tests .
+else
+    docker-compose -p loops run --rm tests $@
+fi

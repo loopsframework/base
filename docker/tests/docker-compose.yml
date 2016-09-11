@@ -1,0 +1,7 @@
+version: "2"
+
+services:
+  tests:
+    build:
+      context: ../..
+      dockerfile: docker/tests/Dockerfile

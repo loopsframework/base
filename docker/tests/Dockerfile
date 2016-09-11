@@ -9,14 +9,29 @@
 # Dockerfile that creates an environment for unit testing
 #
 
-FROM php:5
+FROM php:7
 
-RUN apt-get update
-RUN apt-get -y upgrade
-RUN apt-get install -y --no-install-recommends git unzip
+# Install dependencies
+RUN apt-get update && \
+    apt-get -y upgrade && \
+    apt-get install -y --no-install-recommends git unzip
 
+# Install composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin --filename=composer
-RUN composer require loopsframework/base:dev-master
-RUN composer require phpunit/phpunit:^5
 
-ENTRYPOINT [ "vendor/bin/phpunit", "vendor/loopsframework/base/tests/" ]
+# Copy files into here
+RUN mkdir -p /opt/loops
+
+# Download and install packages via composer (will be cached by docker)
+ADD composer.json /opt/loops
+WORKDIR /opt/loops
+RUN composer install
+
+# Copy source code
+ADD . /opt/loops
+
+# Move into test directory
+WORKDIR /opt/loops/tests
+
+# phpunit
+ENTRYPOINT [ "/opt/loops/vendor/bin/phpunit" ]
