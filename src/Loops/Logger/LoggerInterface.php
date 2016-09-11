@@ -12,9 +12,9 @@
 namespace Loops\Logger;
 
 use Loops\Messages\Message;
+use Psr\Log\LoggerInterface as PsrLoggerInterface;
 
-interface LoggerInterface {
-    public function log(Message $message);
-    public function setSeverity($severity);
-    public function getSeverity();
+interface LoggerInterface extends PsrLoggerInterface {
+    public function setLogLevel($log_level);
+    public function getLogLevel();
 }

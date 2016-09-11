@@ -20,20 +20,18 @@ use Loops\Messages\Message;
 
 class FileLogger extends Logger {
     protected $fo;
-    
-    public function __construct($filename = "loops.log", $mode = "a+", $severity = "NOTICE", $stderr_logging_cli = TRUE, Loops $loops = NULL) {
-        parent::__construct($severity, $stderr_logging_cli, $loops);
-        
-        if(!strpos($filename, "://")) {
-            $application = $this->getLoops()->getService("application");
-            $filename = Misc::fullPath($filename, $application->cache_dir);
-        }
+
+    public function __construct($filename = "loops.log", $mode = "a+", $level = "notice", Loops $loops = NULL) {
+        parent::__construct($level, $loops);
+
+        $application = $this->getLoops()->getService("application");
+
+        $filename = Misc::fullPath($filename, $application->cache_dir);
 
         $this->fo = new SplFileObject($filename, $mode);
     }
-    
-    protected function __log(Message $message) {
-        $line = $this->line($message)."\n";
-        return $this->fo->fwrite($line) == strlen($line);
+
+    protected function logMessage(Message $message) {
+        $this->fo->fwrite("$message\n");
     }
 }

@@ -14,7 +14,7 @@ namespace Loops\Logger;
 use Loops\Messages\Message;
 
 class ErrorlogLogger extends Logger {
-    public function __log(Message $message) {
-        return error_log($this->line($message));
+    protected function logMessage(Message $message) {
+        return error_log((string)$message);
     }
 }

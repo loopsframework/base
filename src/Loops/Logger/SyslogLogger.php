@@ -16,7 +16,7 @@ use SplFileObject;
 use Loops\Messages\Message;
 
 class SyslogLogger extends Logger {
-    protected function __log(Message $message) {
+    protected function logMessage(Message $message) {
         return syslog($message->severity, $message->message);
     }
 }

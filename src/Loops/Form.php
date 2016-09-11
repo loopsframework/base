@@ -37,7 +37,7 @@ use Loops\Form\Value;
  * Form elements take care about filtering (adjusting) the user input and produce errors on invalid input.
  *
  * 1. Form setup
- * 
+ *
  * The form class is concepted to initialize itself automatically based on a passed object (entity)
  * or by inheritance.
  *
@@ -48,12 +48,12 @@ use Loops\Form\Value;
  *
  * <code>
  *     class Entity extends ArrayObject {
- *         
+ *
  *     }
- *     
- *     
+ *
+ *
  * </code>
- * 
+ *
  * b) by inheritance
  * c) mixed
  * d) manually
@@ -62,7 +62,7 @@ use Loops\Form\Value;
  *
  * For a more formal explanation please refer the the constructor documentation.
  *
- * 
+ *
  *
  * <code>
  * </code>
@@ -74,7 +74,7 @@ use Loops\Form\Value;
  * 3. The form on Loops pages
  *
  * tba
- * 
+ *
  * 4. Events
  *
  * tba
@@ -83,63 +83,63 @@ class Form extends Element {
     use SessionTrait {
         SessionTrait::initFromSession as SessionTraitInitFromSession;
     }
-    
+
     protected $ajax_access = TRUE;
     protected $direct_access = TRUE;
-    
+
     /**
      * @var bool $noconfirm If set to true, the confirm page has to be skipped on url based access. Directly access the submit page with the POST data in this case.
-     * 
+     *
      * @ReadWrite
      * @Expose
      */
     protected $no_confirm   = FALSE;
-    
+
     /**
      * @var bool $confirmed States if the form is in confirmed state.
-     * 
+     *
      * @ReadOnly
      * @Expose
      * @SessionVar
      */
     protected $confirmed   = FALSE;
-    
+
     /**
      * @var bool $confirmed States if the form is in submitted state.
-     * 
+     *
      * @ReadOnly
      * @Expose
      */
     protected $submitted   = FALSE;
-    
+
     /**
      * @var Loops\Messages\MessageList $messages Holds (error) messages that should be displayed with the form.
-     * 
+     *
      * @ReadOnly
      * @Expose
      */
     protected $messages;
-    
+
     /**
      * @var bool Should be set to TRUE if this form is a part of another form.
      *
      * This value is a hint for form elements to determine their element name.
-     * 
+     *
      * @ReadWrite
      */
     protected $weak = FALSE;
-    
+
     /**
      * @var callable A callbackobject that will be executed on form validation.
-     * 
+     *
      * @Listen("Form\onValidate")
      * @ReadWrite
      */
     protected $onValidate;
-    
+
     /**
      * @var callable A callbackobject that will be executed on form confirmation.
-     * 
+     *
      * @Listen("Form\onConfirm")
      * @ReadWrite
      */
@@ -147,59 +147,59 @@ class Form extends Element {
 
     /**
      * @var callable A callbackobject that will be executed on form submission.
-     * 
+     *
      * @Listen("Form\onSubmit")
      * @ReadWrite
      */
     protected $onSubmit;
-    
+
     /**
      * @var array of Loops\Form\Element A list of all elements of the form.
-     * 
+     *
      * @Expose
      * @ReadOnly("getFormElements")
      */
     protected $elements;
-    
+
     /**
      * @var ArrayAccess The current value of the form.
-     * 
+     *
      * @Expose
      * @SessionVar
      * @ReadOnly("getValue")
      */
     protected $value;
-    
+
     /**
      * @Listen("Form\onValidate")
      */
     protected function onValidate($value) {
         return TRUE;
     }
-    
+
     /**
      * @Listen("Form\onConfirm")
      */
     protected function onConfirm($value) {
         return TRUE;
     }
-    
+
     /**
      * @Listen("Form\onSubmit")
      */
     protected function onSubmit($value) {
         return TRUE;
     }
-    
+
     /**
      * Construct a form object
      *
      * Form elements will be added to the form based on annotations.
      * Loops will look for annotations of the type 'Loops\Annotations\Form\Element',
      * 'Loops\Annotations\Form\Validator' and 'Loops\Annotations\Form\Filter' on properties.
-     * 
+     *
      * Annotations are collected from two places.
-     * 
+     *
      * 1. The passed entity
      *     If the passed default value (entity) is an object, the properties of its class definition will be inspected for annotations.
      *     For every annotation found, a form element is added.
@@ -218,18 +218,18 @@ class Form extends Element {
      */
     public function __construct(ArrayAccess $value = NULL, $filter = "", $context = NULL, Loops $loops = NULL) {
         parent::__construct($context, $loops);
-        
-        $this->messages = new MessageList(Message::ERR);
-        
+
+        $this->messages = new MessageList(Message::ERROR);
+
         $this->value = $value ?: new ArrayObject;
 
         if($value) {
             $this->addFromAnnotations($value, $filter);
         }
-        
+
         $this->addFromAnnotations($this, $filter);
     }
-    
+
     /**
      * Adds form elements based on annotations.
      *
@@ -241,10 +241,10 @@ class Form extends Element {
      *
      * The following example will assign an element of type "Loops\Form\Element\Number" to the form.
      * <code>
-     * 
+     *
      * use Loops\Annotations\Form\Element;
      * use Loops\Form;
-     * 
+     *
      * class ExampleClass {
      *     /**
      *      * \@Element("Number")
@@ -276,7 +276,7 @@ class Form extends Element {
      *
      * use Loops\Annotations\Form\Element;
      * use Loops\Form;
-     * 
+     *
      * class ExampleClass2 {
      *     /**
      *      * \@Element("Number",filter="group1")
@@ -307,7 +307,7 @@ class Form extends Element {
      * $form->addFromAnnotations("ExampleClass2", "group2");
      * //this will add a form element at property "test4",
      * $form->addFromAnnotations("ExampleClass2");
-     * 
+     *
      * </code>
      *
      * The filter property on the annotation and also the $filter argument may be an array. In this case
@@ -327,7 +327,7 @@ class Form extends Element {
      * use Loops\Annotations\Form\Validator;
      * use Loops\Annotations\Form\Filter;
      * use Loops\Form;
-     * 
+     *
      * class ExampleClass3 {
      *     /**
      *      * \@Element("Text")
@@ -346,7 +346,7 @@ class Form extends Element {
      * $form = new Form;
      * //this will assign form elements "test" with a validator and filter.
      * $form->addFromAnnotations("ExampleClass3");
-     * 
+     *
      * </code>
      *
      * If the passed $classname is an object and its class defines form events, they will also be registered
@@ -361,31 +361,31 @@ class Form extends Element {
 
         //init elements from annotations
         $properties = $loops->getService("annotations")->get(is_object($classname) ? get_class($classname) : $classname)->properties;
-        
+
         $result = [];
-        
+
         foreach($properties->find("Form\Element") as $key => $annotations) {
             foreach($annotations as $annotation) {
                 if(!array_intersect((array)$annotation->filter, (array)$filter)) {
                     continue;
                 }
-                
+
                 $element = $annotation->factory($this, $loops);
                 $this->$key = $element;
-            
+
                 foreach($properties->$key->find("Form\Validator") as $annotation) {
                     if(!array_intersect((array)$annotation->filter, (array)$filter)) {
                         continue;
                     }
-                    
+
                     $element->addValidator($annotation->factory($element, $loops));
                 }
-                
+
                 foreach($properties->$key->find("Form\Filter") as $annotation) {
                     if(!array_intersect((array)$annotation->filter, (array)$filter)) {
                         continue;
                     }
-                    
+
                     $element->addFilter($annotation->factory($element, $loops));
                 }
 
@@ -397,7 +397,7 @@ class Form extends Element {
         if(is_object($classname) && $classname !== $this) {
             $this->bindEventObject($classname, [ "Form\onValidate", "Form\onConfirm", "Form\onSubmit", "Form\onCleanup" ]);
         }
-        
+
         foreach($this->getFormElements() as $name => $child) {
             if($this->value->offsetExists($name)) {
                 $child->setValue($this->value->offsetGet($name));
@@ -409,7 +409,7 @@ class Form extends Element {
 
         return $result;
     }
-    
+
     /**
      * Checks passed input for its validity
      *
@@ -438,27 +438,27 @@ class Form extends Element {
      */
     public function confirm($values) {
         $this->confirmed = FALSE;
-        
+
         $values = Misc::unflattenArray($values, "-");
 
         foreach($this->getFormElements() as $name => $child) {
             $child->setValue(array_key_exists($name, $values) ? $values[$name] : NULL);
             $this->value->offsetSet($name, $child->getValue(FALSE));
         }
-        
+
         if(!$this->validate()) {
             return FALSE;
         }
-        
+
         if(!$this->fireEvent("Form\onConfirm", [ $this->value, $this ], TRUE, FALSE)) {
             return FALSE;
         }
-        
+
         $this->applyFilter();
-        
+
         return $this->confirmed = TRUE;
     }
-    
+
     /**
      * Validates all form elements
      *
@@ -466,7 +466,7 @@ class Form extends Element {
      */
     public function validate() {
         $validated = TRUE;
-        
+
         foreach($this->getFormElements() as $name => $child) {
             $validated &= $child->validate();
         }
@@ -475,7 +475,7 @@ class Form extends Element {
 
         return (bool)$validated;
     }
-    
+
     /**
      * Undoes the confirmed status
      *
@@ -484,7 +484,7 @@ class Form extends Element {
     public function back() {
         $this->confirmed = FALSE;
     }
-    
+
     /**
      * Updates the value and applies the hard filter
      *
@@ -496,7 +496,7 @@ class Form extends Element {
             $this->value->offsetSet($name, $child->getValue(TRUE));
         }
     }
-    
+
     /**
      * Submits the form
      *
@@ -520,25 +520,25 @@ class Form extends Element {
         if(!$this->confirmed) {
             throw new Exception("Form: Please call 'confirm' before calling 'submit'.");
         }
-        
+
         $this->submitted = $this->fireEvent("Form\onSubmit", [ $this->getValue(), $this ], TRUE, FALSE);
-        
+
         if($this->submitted) {
             $this->fireEvent("Form\onCleanup", [ $this ]);
         }
 
         return $this->submitted;
     }
-    
+
     /**
      * The session will be forcefully initialized when rendering the form with the renderer
-     * 
+     *
      * @Listen("Renderer\onRender")
      */
     public function initFromSession() {
         $this->SessionTraitInitFromSession();
     }
-    
+
     /**
      * Trigger the confirm action via URL
      *
@@ -565,12 +565,12 @@ class Form extends Element {
         else if(!$this->confirmed) {
             return Misc::redirect($this, 302, $this->getLoops());
         }
-        
+
         $this->saveToSession();
 
         return TRUE;
     }
-    
+
     /**
      * Trigger the back action via URL
      *
@@ -583,16 +583,16 @@ class Form extends Element {
         if($parameter) {
             return;
         }
-        
+
         $this->initFromSession();
 
         $this->back();
-        
+
         $this->saveToSession();
-        
+
         return Misc::redirect($this, 302, $this->getLoops());
     }
-    
+
     /**
      * Trigger the submit action via URL
      *
@@ -614,16 +614,16 @@ class Form extends Element {
         if($parameter) {
             return;
         }
-        
+
         $this->initFromSession();
 
         if(!$this->request->isPost()) {
-            
+
             if($this->confirmed) {
                 $this->back();
                 $this->saveToSession();
             }
-            
+
             return Misc::redirect($this);
         }
 
@@ -637,18 +637,18 @@ class Form extends Element {
         }
 
         $this->submitted = $this->submit();
-        
+
         if($this->no_confirm) {
             $this->confirmed = $this->submitted;
         }
-        
+
         if($this->submitted) {
             $this->clearSession();
         }
 
         return TRUE;
     }
-    
+
     /**
      * Return all form elements that were assigned to this form
      *
@@ -657,7 +657,7 @@ class Form extends Element {
     public function getFormElements() {
         return iterator_to_array($this->getGenerator(TRUE, TRUE, "Loops\Form\Element", [ "value", "loopsid", "pagepath", "elements" ]));
     }
-    
+
     /**
      * Returns the value of the form
      *
@@ -668,25 +668,25 @@ class Form extends Element {
      *
      * The value can also be retrieved as an array. In this case, the values will be hard filtered by default.
      * If you want to hard filter the values in the object (entity), use the applyFilter method.
-     * 
+     *
      * @param bool $array Specifies if the value should be returned as an array
      * @param bool $array_strict If set to true and an array is requested, the array will contain hard filtered values
      */
     public function getValue($array = FALSE, $array_strict = TRUE) {
         if($array) {
             $result = [];
-            
+
             foreach($this->getFormElements() as $name => $child) {
                 $result[$name] = $child->getValue($array_strict);
             }
-            
+
             return $result;
         }
         else {
             return $this->value;
         }
     }
-    
+
     /**
      * Return the current value as a form value
      *
@@ -702,46 +702,46 @@ class Form extends Element {
      */
     public function getFormValue($strict = FALSE) {
         $result = [];
-            
+
         foreach($this->getFormElements() as $name => $child) {
             $result[$name] = $child instanceof Subform ? $child->getFormValue($strict) : $child->getValue($strict);
         }
 
         return new Value($this, $result);
     }
-    
+
     /**
      * The session trait directly sets the values - call setValue manually
-     * 
+     *
      * @Listen("Session\onInit")
      */
     public function onSessionInit($value) {
         if(!$value->offsetExists("value")) {
             return;
         }
-        
+
         $value = $value->offsetGet("value");
-        
+
         foreach($this->getFormElements() as $name => $child) {
             if(!$value->offsetExists($name)) continue;
-            
+
             $newvalue = $value->offsetGet($name);
-            
+
             $child->setValue($newvalue);
-            
+
             //check if child did some processing/initializing on object values - keep sync
-            
+
             $childvalue = $child->getValue();
-            
+
             if($newvalue !== $childvalue) {
                 $value->offsetSet($name, $childvalue);
             }
         }
     }
-    
+
     /**
      * Forward "Form\onCleanup" event to all form elements
-     * 
+     *
      * @Listen("Form\onCleanup")
      */
     protected function cleanupChildren() {

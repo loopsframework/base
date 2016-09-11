@@ -7,7 +7,8 @@
     "require": {
         "smarty/smarty": "^3",
         "doctrine/orm": "^2.5",
-        "donatj/flags": "^1"
+        "donatj/flags": "^1",
+        "psr/log": "^1"
     },
     "require-dev": {
         "phpunit/phpunit": "^5"

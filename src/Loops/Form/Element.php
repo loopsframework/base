@@ -32,58 +32,58 @@ abstract class Element extends LoopsElement {
      * @Expose
      */
     protected $label;
-    
+
     /**
      * @ReadWrite
      * @Expose
      */
     protected $description;
-    
+
     /**
      * @ReadOnly
      * @Expose
      */
     protected $messages;
-    
+
     /**
      * @ReadWrite
      * @Expose
      */
     protected $nullable = FALSE;
-    
+
     /**
      * @ReadOnly("getFormName")
      * @Expose
      */
     protected $name;
-    
+
     /**
      * @var array
      */
     protected $null_if = [ "" ];
-    
+
     /**
      * @ReadOnly
      */
     protected $validators = [];
-    
+
     /**
      * @ReadOnly
      */
     protected $filters = [];
-    
+
     protected $internal_filters = [];
-    
+
     protected $value;
-    
+
     protected $default;
-    
+
     public function __construct($default = NULL, $validators = [], $filters = [], $context = NULL, Loops $loops = NULL) {
         parent::__construct($context, $loops);
-        
+
         $this->default = $default;
         $this->setValue($default);
-        $this->messages = new MessageList(Message::ERR);
+        $this->messages = new MessageList(Message::ERROR);
 
         foreach($validators as $validator) {
             $this->addValidator($validator);
@@ -93,26 +93,26 @@ abstract class Element extends LoopsElement {
             $this->addFilter($filter);
         }
     }
-    
+
     public function getFormName() {
         $parts   = [];
         $element = $this;
-        
+
         while($parent = $element->getParent()) {
             if($element instanceof Element) {
                 array_unshift($parts, $element->getName());
             }
-            
+
             if($element instanceof Form && !$element->weak) {
                 break;
             }
-            
+
             $element = $parent;
         };
-        
+
         return implode("-", $parts);
     }
-    
+
     public function addValidator(Validator $validator, $before = FALSE) {
         if($before) {
             array_unshift($this->validators, $validator);
@@ -121,7 +121,7 @@ abstract class Element extends LoopsElement {
             array_push($this->validators, $validator);
         }
     }
-    
+
     public function addFilter(Filter $filter, $before = FALSE) {
         if($before) {
             array_unshift($this->filters, $filter);
@@ -130,37 +130,37 @@ abstract class Element extends LoopsElement {
             array_push($this->filters, $filter);
         }
     }
-    
+
     protected function addInternalFilter(Filter $filter, $before = FALSE) {
         if($before) {
             array_unshift($this->internal_filters, $filter);
-            
+
         }
         else {
             array_push($this->internal_filters, $filter);
         }
     }
-    
+
     public function setValue($value) {
         if($this->nullable && in_array($value, $this->null_if, TRUE)) {
             $value = NULL;
         }
-        
+
         foreach(array_merge($this->internal_filters, $this->filters) as $filter) {
             if($this->nullable && $value === NULL) {
                 break;
             }
-            
+
             $value = $filter->prepare($value);
         }
-        
+
         return $this->value = $value;
     }
-    
+
     public function getDefault() {
         return $this->default;
     }
-    
+
     /**
      * @Expose(name="value")
      */
@@ -168,20 +168,20 @@ abstract class Element extends LoopsElement {
         if(!$strict) {
             return $this->value;
         }
-        
+
         if($this->nullable && $this->value === NULL) {
             return NULL;
         }
 
         $value = $this->value;
-        
+
         foreach(array_merge($this->internal_filters, $this->filters) as $filter) {
             $value = $filter->filter($value);
         }
-        
+
         return $value;
     }
-    
+
     /**
      * @todo last,break handling with annotated validators
      */
@@ -192,19 +192,19 @@ abstract class Element extends LoopsElement {
         else {
             $validators = $this->validators;
         }
-        
+
         $value = $this->getValue();
 
         $result = $this->fireEvent("Form\onValidate", [ $value, $this ], TRUE);
 
         foreach($validators as $validator) {
             $result = (bool)($result & $validator->validate($value, $this));
-            
+
             if($result ? $validator->doBreak() : $validator->isLast()) {
                 break;
             }
         }
-        
+
         return $result;
     }
 }
