@@ -23,22 +23,22 @@ class Element extends Object {
      * @Required
      */
     public $class;
-    
+
     /**
      * @var string|array<string>
      */
     public $filter = [ "" ];
-    
+
     /**
      * @var bool
      */
     public $auto_resolve = FALSE;
-    
+
     /**
      * @var string
      */
     protected $namespace = "Loops\Form\Element\\";
-    
+
     /**
      * @var string
      */

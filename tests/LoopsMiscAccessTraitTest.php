@@ -14,13 +14,13 @@ class AccessTestMockExpose0 implements IteratorAggregate {
 
 class AccessTestMockExpose1 implements IteratorAggregate {
     use AccessTrait;
-    
+
     protected $test1 = "test1";
 }
 
 class AccessTestMockExpose2 implements IteratorAggregate {
     use AccessTrait;
-    
+
     /**
      * @Expose
      */
@@ -29,9 +29,9 @@ class AccessTestMockExpose2 implements IteratorAggregate {
 
 class AccessTestMockExpose3 implements IteratorAggregate {
     use AccessTrait;
-    
+
     public $test = "test";
-    
+
     /**
      * @Expose
      */
@@ -40,13 +40,13 @@ class AccessTestMockExpose3 implements IteratorAggregate {
 
 class AccessTestMockExpose4 implements IteratorAggregate {
     use AccessTrait;
-    
+
     public $test4 = "test4";
 }
 
 class AccessTestMockReadOnly {
     use AccessTrait;
-    
+
     /**
      * @ReadOnly
      */
@@ -55,12 +55,12 @@ class AccessTestMockReadOnly {
 
 class AccessTestMockReadOnlyGetter {
     use AccessTrait;
-    
+
     /**
      * @ReadOnly("getRo")
      */
     protected $rovalue;
-    
+
     public function getRo() {
         return "test2";
     }
@@ -68,7 +68,7 @@ class AccessTestMockReadOnlyGetter {
 
 class AccessTestMockReadWrite {
     use AccessTrait;
-    
+
     /**
      * @ReadWrite
      */
@@ -77,16 +77,16 @@ class AccessTestMockReadWrite {
 
 class AccessTestMockReadWriteGetterSetter {
     use AccessTrait;
-    
+
     /**
      * @ReadWrite("setRw",getter="getRw")
      */
     protected $rwvalue;
-    
+
     public function getRw() {
         return $this->rwvalue."test4";
     }
-    
+
     public function setRw($value) {
         $this->rwvalue = $value."test5";
     }
@@ -98,58 +98,58 @@ class LoopsMiscAccessTraitTest extends LoopsTestCase {
         $object = new AccessTestMockExpose0;
         $object->offsetGet("non_existing_value");
     }
-    
+
     public function testExposeNone() {
         $object = new AccessTestMockExpose0;
-        
+
         $result = [];
-        
+
         foreach($object as $key => $value) {
             $result[$key] = $value;
         }
-        
+
         $this->assertSame([], $result);
     }
-    
+
     public function testExposePublic() {
         $object = new AccessTestMockExpose4;
-        
+
         $result = [];
-        
+
         foreach($object as $key => $value) {
             $result[$key] = $value;
         }
-        
+
         $this->assertSame(["test4" => "test4"], $result);
     }
-    
+
     public function testExposeNoAnnotation() {
         $object = new AccessTestMockExpose1;
-        
+
         $result = [];
-        
+
         foreach($object as $key => $value) {
             $result[$key] = $value;
         }
-        
+
         $this->assertSame([], $result);
     }
-    
+
     public function testExpose() {
         $object = new AccessTestMockExpose2;
-        
+
         $result = [];
-        
+
         foreach($object as $key => $value) {
             $result[$key] = $value;
         }
-        
+
         $this->assertSame(["test2"=>"test2"], $result);
     }
-    
+
     public function testExposeMixed() {
         $object = new AccessTestMockExpose3;
-        
+
         $result = [];
 
         foreach($object as $key => $value) {
@@ -158,30 +158,30 @@ class LoopsMiscAccessTraitTest extends LoopsTestCase {
 
         $this->assertSame(["test"=>"test","test3"=>"test3"], $result);
     }
-    
+
     public function testReadOnly() {
         $object = new AccessTestMockReadOnly;
         $this->assertEquals("test", $object->offsetGet("rovalue"));
     }
-    
+
     public function testReadOnlyException() {
         $this->setExpectedException("Loops\Exception");
         $object = new AccessTestMockReadOnly;
         $object->offsetSet("rovalue", "except");
     }
-    
+
     public function testReadOnlyGetter() {
         $object = new AccessTestMockReadOnlyGetter;
         $this->assertEquals("test2", $object->offsetGet("rovalue"));
     }
-    
+
     public function testReadWrite() {
         $uid = uniqid();
         $object = new AccessTestMockReadWrite;
         $object->offsetSet("rwvalue", $uid);
         $this->assertEquals($uid, $object->offsetGet("rwvalue"));
     }
-    
+
     public function testReadWriteGetterSetter() {
         $uid = uniqid();
         $object = new AccessTestMockReadWriteGetterSetter;

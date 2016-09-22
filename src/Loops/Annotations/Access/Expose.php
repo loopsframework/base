@@ -20,7 +20,7 @@ class Expose {
      * @var string
      */
     public $name;
-    
+
     /**
      * @var array
      */

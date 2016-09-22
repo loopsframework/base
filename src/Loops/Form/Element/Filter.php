@@ -15,10 +15,10 @@ use Loops\Object;
 
 abstract class Filter extends Object {
     protected $strong = TRUE;
-    
+
     public function prepare($value) {
         return $this->strong ? $this->filter($value) : $value;
     }
-    
+
     abstract public function filter($value);
 }

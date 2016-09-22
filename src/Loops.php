@@ -23,7 +23,7 @@ use Loops\Annotations\Access\ReadOnly;
  */
 class Loops extends Object {
     const VERSION = "0.1";
-    
+
     /**
      * @var Loops The latest context that has been created.
      */
@@ -33,16 +33,16 @@ class Loops extends Object {
      * @var ArrayAccess The config directives that are used by this Loops context.
      */
     private $config;
-    
+
     private $services = [];
     private $shared_instances = [];
-    
+
     /**
      * @var bool Specifies if loops runs in debug mode
      * @ReadOnly
      */
     protected $debug;
-    
+
     /**
      * Creates the Loops Context
      *
@@ -56,14 +56,14 @@ class Loops extends Object {
     public function __construct(ArrayObject $config, $debug = TRUE) {
         $this->config = $config;
         $this->debug = $debug;
-        
+
         Loops::$current_loops = $this;
-        
+
         parent::__construct($this);
-        
+
         $this->registerService("config", $config);
     }
-    
+
     /**
      * Checks if a service exists
      *
@@ -75,16 +75,16 @@ class Loops extends Object {
         if(array_key_exists($name, $this->services)) {
             return TRUE;
         }
-        
+
         if(!$resolve) {
             return FALSE;
         }
-        
+
         $classname = "Loops\\Service\\".Misc::camelize($name);
-        
+
         if(class_exists($classname)) {
             $reflection = new ReflectionClass($classname);
-            
+
             if($reflection->implementsInterface("Loops\ServiceInterface")) {
                 if(!$classname::hasService($this)) {
                     return FALSE;
@@ -92,10 +92,10 @@ class Loops extends Object {
                 $this->registerService($name, $classname, [], $classname::isShared($this));
             }
         }
-        
+
         return $this->hasService($name, FALSE);
     }
-    
+
     /**
      * Returns a service
      *
@@ -109,20 +109,20 @@ class Loops extends Object {
         if(!$this->hasService($name)) {
             throw new Exception("Service '$name' does not exist.");
         }
-        
+
         if(array_key_exists($name, $this->shared_instances)) {
             return $this->shared_instances[$name];
         }
-        
+
         $service = $this->createService($name, NULL, TRUE);
-        
+
         if($this->services[$name]["shared"]) {
             $this->shared_instances[$name] = $service;
         }
 
         return $service;
     }
-    
+
     /**
      * Creates a new instance of a service
      *
@@ -133,11 +133,11 @@ class Loops extends Object {
     public function createService($name, ArrayObject $config = NULL, $merge_into_config = FALSE) {
         if($merge_into_config) {
             $service_config = $this->config->offsetExists($name) ? $this->config->offsetGet($name) : new ArrayObject;
-        
+
             if(is_array($service_config)) {
                 $service_config = ArrayObject::fromArray($service_config);
             }
-            
+
             if($config) {
                 $service_config->merge($config);
             }
@@ -145,19 +145,19 @@ class Loops extends Object {
         else {
             $service_config = $config ?: new ArrayObject;
         }
-        
+
         if(!$this->hasService($name)) {
             throw new Exception("Service '$name' does not exist.");
         }
-        
+
         $service = $this->services[$name];
-        
+
         if(array_key_exists("classname", $service)) {
             $reflection = new ReflectionClass($service["classname"]);
-            
+
             $params = new ArrayObject($service["params"]);
             $params->merge($service_config);
-            
+
             if($reflection->implementsInterface("Loops\ServiceInterface")) {
                 return call_user_func_array([$service["classname"], "getService" ], [ $params, $this ]);
             }
@@ -166,18 +166,18 @@ class Loops extends Object {
                 return Misc::reflectionInstance($service["classname"], $params);
             }
         }
-        
+
         if(array_key_exists("callback", $service)) {
             $params = new ArrayObject($service["params"]);
             $params->merge($service_config);
             return call_user_func_array($service["callback"], $params->toArray());
         }
-        
+
         if(array_key_exists("object", $service)) {
             return $service["object"];
         }
     }
-    
+
     /**
      * Registers a custom Service
      *
@@ -200,7 +200,7 @@ class Loops extends Object {
             throw new Exception("Failed to register service.");
         }
     }
-    
+
     /**
      * Returns the current default Context
      *
@@ -213,7 +213,7 @@ class Loops extends Object {
         if(!self::$current_loops) {
             throw new Exception("No Loops Context was created yet.");
         }
-        
+
         return self::$current_loops;
     }
 }

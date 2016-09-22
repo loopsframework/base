@@ -31,7 +31,7 @@ use ReflectionClass;
  *     namespace Pages;
  *
  *     use Loops\Page;
- *     
+ *
  *     class Index extends Page {
  *         public $message = "Hello World!";
  *     }
@@ -44,13 +44,13 @@ abstract class Page extends Element {
      * @var bool Display this Loops element when beeing accessed without parameter (see WebCore service)
      */
     protected $direct_access = TRUE;
-    
+
     /**
      * @ReadOnly
      * @var array The page parameter that were used to create this page
      */
     protected $parameter;
-    
+
     /**
      * The Page constructor
      *
@@ -66,7 +66,7 @@ abstract class Page extends Element {
         parent::__construct(NULL, $loops);
         $this->parameter = $parameter;
     }
-    
+
     /**
      * Take page element inheritance into account when generating the loopsid.
      *
@@ -74,12 +74,12 @@ abstract class Page extends Element {
      * of the pages classname.
      * Namespace parts that are underscores, as well if the classname is an underscore will be replaced with
      * the parameters that were used to create the page.
-     * 
+     *
      * If the argument refkey is set, a part of the Loops id of a child element is requested. (See documentation
      * of "Loops\Element")
      * The part of the Loops id is generated and based on which property the child elemement is stored. The
      * declaring classname is used, this may be the name of a parent class.
-     * 
+     *
      *
      * Example:
      * In this example, the Loops id of property $form will not change, regardless which of the three classes are instantiated.
@@ -99,14 +99,14 @@ abstract class Page extends Element {
      *     class Subtestpage extends Testpage {
      *         /**
      *          * \@Form
-     *          {@*}     
+     *          {@*}
      *         protected $other_form; //Loops id of this element will be "Pages-Subtestpage-other_form"
      *     }
      *
      *     class _ extends Testpage {
      *         /**
      *          * \@Form
-     *          {@*}     
+     *          {@*}
      *         protected $other_form; //Loops id of this element will be "Pages-*-other_form" where * is replaced by the first parameter of the argument $parameter in the constructor
      *     }
      * </code>
@@ -115,7 +115,7 @@ abstract class Page extends Element {
      */
     protected function __getLoopsId($refkey = NULL) {
         $classname = get_class($this);
-        
+
         if($refkey) {
             $reflection = new ReflectionClass($classname);
             if($reflection->hasProperty($refkey)) {
@@ -142,10 +142,10 @@ abstract class Page extends Element {
         else {
             $loopsid = str_replace("\\", "-", $classname);
         }
-        
+
         return $loopsid;
     }
-    
+
     /**
      * Returns the page path of this page
      *
@@ -164,7 +164,7 @@ abstract class Page extends Element {
     public function getPagePath() {
         return WebCore::getPagePathFromClassname(get_class($this), $this->parameter, $this->getLoops());
     }
-    
+
     /**
      * Returns TRUE by default
      *

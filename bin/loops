@@ -15,11 +15,11 @@ use Loops\Application\LoopsAdmin;
 
 try {
     set_time_limit(0);
-    
+
     $root_dir = realpath(__DIR__."/../../../..");
-    
+
     require_once("$root_dir/vendor/autoload.php");
-    
+
     $app = new LoopsAdmin("$root_dir/app", $_SERVER["argv"]);
     exit((int)$app->run());
 }

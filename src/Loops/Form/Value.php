@@ -24,16 +24,16 @@ class Value extends ArrayObject {
      * Note: PHP can have properties and static properties of the same name
      */
     private static $forms = [];
-    
+
     public function __construct(Form $form, $array = [], $flags = StdArrayObject::ARRAY_AS_PROPS, $iterator_class = "ArrayIterator") {
         parent::__construct($array, $flags, $iterator_class);
         self::$forms[spl_object_hash($this)] = $form;
     }
-    
+
     public function getForm() {
         return self::$forms[spl_object_hash($this)];
     }
-    
+
     public function __destruct() {
         unset(self::$forms[spl_object_hash($this)]);
     }

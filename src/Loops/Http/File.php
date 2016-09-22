@@ -17,7 +17,7 @@ class File {
     private $location;
     private $error;
     private $size;
-    
+
     public function __construct($file_array) {
         $this->name = $file_array["name"];
         $this->type = $file_array["type"];
@@ -25,32 +25,32 @@ class File {
         $this->size = $file_array["size"];
         $this->error = $file_array["error"];
     }
-    
+
     public function moveTo($target) {
         if(!move_uploaded_file($this->location, $target)) {
             return FALSE;
         }
-        
+
         $this->location = $target;
         return TRUE;
     }
-    
+
     public function getError() {
         return $this->error;
     }
-    
+
     public function getLocation() {
         return $this->location;
     }
-    
+
     public function getName() {
         return $this->name;
     }
-    
+
     public function getType() {
         return $this->type;
     }
-    
+
     public function getSize() {
         return $this->size;
     }

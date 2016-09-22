@@ -17,43 +17,43 @@ class TestModule extends Object {
     public function simpleAction() {
         $this->application->stdout("action1");
     }
-    
+
     /**
      * @Action("help failingAction")
      */
     public function failingAction() {
         return 123;
     }
-    
+
     /**
      * @Action("help exceptionAction")
      */
     public function exceptingAction() {
         throw new Exception("Test Exception");
     }
-    
+
     public function init_flagActionFlags($flags) {
         $flags->string("test", "default");
     }
-    
+
     /**
      * @Action("help flagAction",init_flags="init_flagActionFlags")
      */
     public function flagAction($test) {
         $this->application->stdout($test);
     }
-    
+
     public function init_dashedFlagActionFlags($flags) {
         $flags->string("test-flag", "default");
     }
-    
+
     /**
      * @Action("help dashedFlagAction",init_flags="init_dashedFlagActionFlags")
      */
     public function dashedFlagAction($test_flag) {
         $this->application->stdout($test_flag);
     }
-    
+
     /**
      * @Action("help otherAction")
      */

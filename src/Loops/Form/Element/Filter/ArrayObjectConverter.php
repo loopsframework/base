@@ -20,7 +20,7 @@ class ArrayObjectConverter extends Filter {
         if(is_array($value)) {
             $value = ArrayObject::fromArray($value);
         }
-        
+
         if(is_null($value)) {
             $value = new ArrayObject;
         }

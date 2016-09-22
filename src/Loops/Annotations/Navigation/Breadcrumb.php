@@ -20,7 +20,7 @@ class Breadcrumb {
      * @var string
      */
     public $title;
-    
+
     /**
      * @var boolean
      */

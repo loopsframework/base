@@ -19,7 +19,7 @@ class Date extends Text {
             $value = new DateTime(parent::filter($value));
             $value->setTime(0,0,0);
         }
-        
+
         return $value;
     }
 }

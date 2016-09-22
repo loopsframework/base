@@ -21,7 +21,7 @@ class ArrayObject extends StdArrayObject {
     public function __construct($array = [], $flags = StdArrayObject::ARRAY_AS_PROPS, $iterator_class = "ArrayIterator") {
         parent::__construct($array, $flags, $iterator_class);
     }
-    
+
     /**
      * Merges values from another Loops\ArrayObject into this one by keys
      *
@@ -37,13 +37,13 @@ class ArrayObject extends StdArrayObject {
                     continue;
                 }
             }
-            
+
             $this->offsetSet($key, $value);
         }
-        
+
         return $this;
     }
-    
+
     /**
      * Returns the keys and values of this object as a standard array
      *
@@ -56,10 +56,10 @@ class ArrayObject extends StdArrayObject {
                 $value = $value->toArray();
             }
         }
-        
+
         return $result;
     }
-    
+
     /**
      * Creates an "Loops\ArrayObject" from a normal PHP array.
      * Nested arrays will recursively converted.
@@ -71,7 +71,7 @@ class ArrayObject extends StdArrayObject {
         $input = array_map(function($value) {
             return is_array($value) ? ArrayObject::fromArray($value) : $value;
         }, $input);
-        
+
         return new ArrayObject($input);
     }
 }

@@ -20,15 +20,15 @@ class UpdateEntityAdminHelper extends Element implements CustomizedRenderInterfa
     private $parameter;
     private $missing;
     private $elements = [];
-    
+
     /**
      * @ReadOnly
      */
     protected $delegate;
-    
+
     public function __construct(EntityAdmin $context, $parameter = [], Loops $loops = NULL) {
         parent::__construct($context, $loops);
-        
+
         $loops      = $this->getLoops();
         $doctrine   = $loops->getService("doctrine");
         $classname  = $doctrine->entity_prefix.$context->entity;
@@ -38,31 +38,31 @@ class UpdateEntityAdminHelper extends Element implements CustomizedRenderInterfa
         $this->parameter = $parameter;
         $this->missing = count($identifier) - count($parameter) - 1 > 0;
     }
-    
+
     public function setDelegateByParameter($parameter) {
         if(!$parameter) {
             return FALSE;
         }
-        
+
         $element = $this;
-        
+
         while($element->offsetExists($parameter[0])) {
             $element = $element->offsetGet(array_shift($parameter));
             if($element instanceof UpdateEntityForm) {
                 return $this->delegate = $element;
             }
         }
-        
+
         return FALSE;
     }
-    
+
     public function delegateRender() {
         return $this->delegate;
     }
-    
+
     public function getTemplateName() {
     }
-    
+
     public function modifyAppearances(&$appearances, &$forced_appearances) {
     }
 
@@ -73,7 +73,7 @@ class UpdateEntityAdminHelper extends Element implements CustomizedRenderInterfa
 
         if(!array_key_exists($offset, $this->elements)) {
             $parameter  = array_merge($this->parameter, [$offset]);
-            
+
             if($entity = $this->context->offsetGet("list")->queryEntity($parameter, $unused, FALSE)) {
                 $this->elements[$offset] = new UpdateEntityForm($entity, ["", "update_entity"], [], $this, $this->getLoops());
             }
@@ -85,20 +85,20 @@ class UpdateEntityAdminHelper extends Element implements CustomizedRenderInterfa
         if($this->elements[$offset]) {
             return TRUE;
         }
-        
+
         return parent::offsetExists($offset);
     }
-    
+
     public function offsetGet($offset) {
         if($this->missing) {
             $intermediate_helper = new UpdateEntityAdminHelper($this->context, array_merge($this->parameter, [$offset]));
             return $this->initChild($offset, $intermediate_helper);
         }
-        
+
         if($this->offsetExists($offset) && array_key_exists($offset, $this->elements)) {
             return $this->initChild($offset, $this->elements[$offset]);
         }
-        
+
         return parent::offsetGet($offset);
     }
 }

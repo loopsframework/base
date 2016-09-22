@@ -20,17 +20,17 @@ class PageParameter {
      * @var string
      */
     public $regexp;
-    
+
     /**
      * @var array
      */
     public $allow;
-    
+
     /**
      * @var array
      */
     public $exclude;
-    
+
     /**
      * @var string
      */

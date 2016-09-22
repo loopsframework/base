@@ -20,27 +20,27 @@ class PageEntry {
      * @var string
      */
     public $title;
-    
+
     /**
      * @var string
      */
     public $name;
-    
+
     /**
      * @var string
      */
     public $filter;
-    
+
     /**
      * @var string
      */
     public $link;
-    
+
     /**
      * @var string
      */
     public $highlight;
-    
+
     /**
      * @var integer
      */

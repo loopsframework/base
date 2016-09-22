@@ -17,18 +17,18 @@ use Loops\Annotations\Admin\Help;
 
 /**
  * Defines actions for the LoopsAdmin application related to cache.
- * 
+ *
  * @Help("This module contains actions for controlling the Loops cache service.")
  */
 class Cache extends Object {
     /**
      * Calls flushAll on cache
-     * 
+     *
      * @Action("Clears the Loops cache via the flushAll call.")
      */
     public function clear() {
         $loops = $this->getLoops();
-        
+
         if($loops->getService("cache")->flushAll()) {
             $loops->getService("logger")->info("Clearing cache was successful.");
             return 0;

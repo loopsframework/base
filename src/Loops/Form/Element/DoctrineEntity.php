@@ -18,14 +18,14 @@ use Loops\Doctrine\UpdateEntityForm;
 class DoctrineEntity extends SubForm {
     private $__filter;
     private $__fields;
-    
+
     public function __construct($entity, $filter = "", $fields = [], $validators = [], $filters = [], $context = NULL, Loops $loops = NULL) {
         $this->__filter = $filter;
         $this->__fields = $fields;
         $form = new PersistEntityForm($entity, $filter, $fields, $context, $loops);
         parent::__construct($form, $validators, $filters, $context, $loops);
     }
-    
+
     public function setValue($value) {
         if(is_object($value) && $value !== $this->value) {
             if($value->id) {

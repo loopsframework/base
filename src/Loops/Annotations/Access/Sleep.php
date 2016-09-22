@@ -20,12 +20,12 @@ class Sleep {
      * @var array<string>
      */
     public $include = [];
-    
+
     /**
      * @var array<string>
      */
     public $exclude = [];
-    
+
     /**
      * @var boolean
      */

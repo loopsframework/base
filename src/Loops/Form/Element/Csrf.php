@@ -20,25 +20,25 @@ use Loops\Session\SessionTrait;
 
 class Csrf extends Text {
     use SessionTrait;
-    
+
     /**
      * @ReadOnly("getToken")
      * @SessionVar
      * @Expose
      */
     protected $token;
-    
+
     public function getToken() {
         $this->initFromSession();
-        
+
         if(!$this->token) {
             $this->token = md5(uniqid());
             $this->saveToSession();
         }
-        
+
         return $this->token;
     }
-    
+
     /**
      * @Listen("Form\onValidate")
      */
@@ -47,7 +47,7 @@ class Csrf extends Text {
             $this->messages->add("CSRF validation failed.");
             return FALSE;
         }
-        
+
         return TRUE;
     }
 }

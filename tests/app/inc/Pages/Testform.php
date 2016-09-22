@@ -21,7 +21,7 @@ class SimpleTestFormSkip extends LoopsForm {
      * @Element("Number")
      */
     protected $test;
-    
+
     protected $no_confirm = TRUE;
 }
 
@@ -31,7 +31,7 @@ class Testform extends Page {
      * @Form("SimpleTestForm")
      */
     protected $form;
-    
+
     /**
      * @Form("SimpleTestFormSkip")
      */

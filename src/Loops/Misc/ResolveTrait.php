@@ -29,7 +29,7 @@ use Loops\Exception;
  * The object will be instantiated by calling the factory method of the annotation.
  * The $context argument is set to this object, while the $loops argument is set to this objects $loops
  * context if it is an instance of "Loops\Object". Otherwise the current global context is used.
- * 
+ *
  * Note that due to the access scope of this trait, protected properties will also
  * be instantiated and returned. Use of private properties is not recommended although it may work in some
  * cases.
@@ -39,10 +39,10 @@ use Loops\Exception;
  * <code>
  *     use Loops\Annotations\Object;
  *     use Loops\Misc\ResolveTrait;
- *     
+ *
  *     class Test implements ArrayAccess {
  *         use ResolveTrait;
- *         
+ *
  *         /**
  *          * ("\@")Object("DateTime")
  *          {@*}
@@ -59,10 +59,10 @@ use Loops\Exception;
  * <code>
  *     use Loops\Annotations\Object;
  *     use Loops\Misc\ResolveTrait;
- *     
+ *
  *     class Test implements ArrayAccess {
  *         use ResolveTrait;
- *         
+ *
  *         /**
  *          * ("\@")Object("DateTime")
  *          {@*}
@@ -79,11 +79,11 @@ use Loops\Exception;
  *
  * Example 3:
  * The Loops\Object class uses ResolveTrait and forwards magic __get access similar to Example 2.
- * 
+ *
  * <code>
  *     use Loops\Object as LoopsObject;
  *     use Loops\Annotations\Object;
- *     
+ *
  *     class Test extends LoopsObject {
  *         /**
  *          * ("\@")Object("DateTime")
@@ -105,7 +105,7 @@ trait ResolveTrait {
     public function offsetExists($offset) {
         return (bool)static::__ResolveTrait_hasObjectAnnotation($this, $offset);
     }
-    
+
     /**
      * Returns the property at the offset.
      *
@@ -121,13 +121,13 @@ trait ResolveTrait {
             if($this->$offset === NULL && $pair[0]->auto_resolve) {
                 $this->$offset = $pair[0]->factory($this, $pair[1]);
             }
-            
+
             return $this->$offset;
         }
-        
+
         user_error("Undefined index: $offset", E_USER_NOTICE);
     }
-    
+
     /**
      * Setting values is not supported and will lead to an exception
      *
@@ -137,7 +137,7 @@ trait ResolveTrait {
     public function offsetSet($offset, $value) {
         throw new Exception("ResolveTrait does not support setting of values. (Tried to set '$offset' of object '".get_class($this)."')");
     }
-    
+
     /**
      * Unsets an offset so it can be instantiated again
      *
@@ -151,18 +151,18 @@ trait ResolveTrait {
             $this->$offset = NULL;
         }
     }
-    
+
     private static function __ResolveTrait_hasObjectAnnotation($class, $offset) {
         $loops = $class instanceof Object ? $class->getLoops() : Loops::getCurrentLoops();
-        
+
         if(!$property = $loops->getService("annotations")->get($class)->properties->$offset) {
             return FALSE;
         }
-        
+
         if(!$annotation = $property->findFirst("Object")) {
             return FALSE;
         }
-        
+
         return [ $annotation, $loops ];
     }
 }

@@ -23,30 +23,30 @@ class RegExp extends Validator {
      * @ReadWrite
      */
     protected $message;
-    
+
     /**
      * @ReadWrite
      */
     protected $message_notstring;
-    
+
     protected $expr;
-    
+
     public function __construct($expr, Loops $loops = NULL) {
         parent::__construct($loops);
         $this->expr = $expr;
     }
-    
+
     function validate($value, Element $element) {
         if(!is_string($value)) {
             $element->messages->add($this->message_notstring ?: "Value must be a string.");
             return FALSE;
         }
-        
+
         if(!preg_match($this->expr, $value)) {
             $element->messages->add(sprintf($this->message ?: "Value must match expression '%s'.", $this->expr));
             return FALSE;
         }
-        
+
         return TRUE;
     }
 }

@@ -41,40 +41,40 @@ abstract class Application extends Object {
      * @ReadOnly
      */
     protected $app_dir;
-    
+
     /**
      * @var string The path to the cache directory
      * @ReadOnly
      */
     protected $cache_dir;
-    
+
     /**
      * @var array An array with registered autoload directories (PSR-4)
      * @ReadOnly
      */
     protected $include_dir;
-    
+
     /**
      * @var bool Specifies if the cached autoload feature is enabled
      * @ReadOnly
      */
     protected $enable_cached_autoload;
-    
+
     /**
      * @var bool Specifies if the cached should be flushed on changes in app_dir
      *
      * This check will only be made in debug mode
-     * 
+     *
      * @ReadOnly
      */
     protected $enable_cache_flush;
-    
+
     /**
      * @var string Location of the boot file
      * @ReadOnly
      */
     protected $boot;
-    
+
     /**
      * Setups a Loops application.
      *
@@ -96,7 +96,7 @@ abstract class Application extends Object {
      * The value ->application->boot can hold a name of a php file that is executed after application creation.
      * This value can be an absolute path or relative to $app_dir. By default the file 'boot.php' inside the application directory is used.
      * Inside the boot script only the variable $loops is set.
-     * 
+     *
      * @param string $app_dir The application directory
      * @param string $cache_dir The directory for temporary files (as full paths or relative to $appdir)
      * @param string|Loops|Loops\ArrayObject $config A Loops context, a Loops\ArrayObject that is used to create a Loops context or the location of a php file that returns a Loops\ArrayObject or Loops context.
@@ -111,7 +111,7 @@ abstract class Application extends Object {
         if(is_string($config)) {
             $config = include(Misc::fullPath($config, $app_dir));
         }
-        
+
         if($config instanceof ArrayObject) {
             $loops = new Loops($config, @$config->loops->debug === NULL ? TRUE : (bool)@$config->loops->debug);
         }
@@ -121,7 +121,7 @@ abstract class Application extends Object {
         else {
             throw new Exception("Failed to create Loops Context.");
         }
-        
+
         //register application service
         $loops->registerService("application", $this);
 
@@ -135,13 +135,13 @@ abstract class Application extends Object {
         if(substr($this->boot, 0, 1) != "/") {
             $this->boot = "$app_dir/".$this->boot;
         }
-        
+
         foreach($this->include_dir as $key => $include_dir) {
             if(substr($include_dir, 0, 1) != "/") {
                 $this->include_dir[$key] = "$app_dir/$include_dir";
             }
         }
-        
+
         //register autoload
         foreach($this->include_dir as $path) {
             spl_autoload_register(function($classname) use ($path) {
@@ -150,7 +150,7 @@ abstract class Application extends Object {
                 require_once($filename);
             });
         }
-        
+
         if($this->enable_cached_autoload) {
             $this->setupCachedAutoload($loops);
         }
@@ -159,48 +159,48 @@ abstract class Application extends Object {
         if($this->enable_cache_flush && $loops->debug) {
             $cache    = $loops->getService("cache");
             $renderer = $loops->getService("renderer");
-            
+
             $dirs = [];
-            
+
             if($this->enable_cache_flush & 0x1) {
                 $dirs[] = $this->app_dir;
             }
-            
+
             if($this->enable_cache_flush & 0x2) {
                 $dirs = array_merge($dirs, $this->include_dir);
             }
-            
+
             if($this->enable_cache_flush & 0x4) {
                 $dirs = array_merge($dirs, $renderer->view_dir);
             }
-            
+
             if($file = Misc::lastChange($dirs, $cache, $key)) {
                 Misc::recursiveUnlink("{$this->cache_dir}/renderer_cache");
                 $cache->flushAll();
                 $cache->save($key, $file->getMTime());
             }
         }
-        
+
         parent::__construct($loops);
-        
+
         //boot if requested
         if($boot) {
             $this->boot();
         }
     }
-    
+
     public function getAppDir() {
         return $this->app_dir;
     }
-    
+
     public function getCacheDir() {
         return $this->cache_dir;
     }
-    
+
     protected function boot() {
         self::isolated_boot($this->getLoops());
     }
-    
+
     /**
      * Initialize autoloading
      */
@@ -208,7 +208,7 @@ abstract class Application extends Object {
         $cache = $loops->getService("cache");
 
         $check = [];
-        
+
         register_shutdown_function(function() use ($cache, &$check) {
             foreach($check as $classname) {
                 if(class_exists($classname, FALSE) || interface_exists($classname, FALSE) || trait_exists($classname, FALSE)) {
@@ -220,7 +220,7 @@ abstract class Application extends Object {
                 }
             }
         });
-        
+
         spl_autoload_register(function($classname) use ($cache, &$check) {
             $key = "Loops-Application-autoload-$classname";
             if($cache->contains($key)) {
@@ -232,7 +232,7 @@ abstract class Application extends Object {
             }
         }, FALSE, TRUE);
     }
-    
+
     /**
      * Get a list of all classnames that are defined in the app directory
      *
@@ -240,11 +240,11 @@ abstract class Application extends Object {
      */
     public function definedClasses() {
         $loops = $this->getLoops();
-        
+
         $cache = $loops->getService("cache");
-        
+
         $key = "Loops-Application-definedClasses";
-        
+
         if($cache->contains($key)) {
             return $cache->fetch($key);
         }
@@ -254,9 +254,9 @@ abstract class Application extends Object {
                 if(substr($file, 0, 1) == '.') {
                     continue;
                 }
-                
+
                 $filename = "$dir/$file";
-                
+
                 if(is_dir($filename)) {
                     $require($filename);
                 }
@@ -265,19 +265,19 @@ abstract class Application extends Object {
                 }
             }
         };
-        
+
         $dirs = $this->include_dir;
-        
+
         array_walk($dirs, $require);
-        
+
         $classes = array_values(array_filter(get_declared_classes(), function($classname) use ($dirs, $cache) {
             $reflection = new ReflectionClass($classname);
             $filename = $reflection->getFileName();
-            
+
             if(!$filename) {
                 return FALSE;
             }
-            
+
             if($this->enable_cached_autoload) {
                 $key = "Loops-Application-autoload-$classname";
                 $cache->save($key, $filename);
@@ -288,23 +288,23 @@ abstract class Application extends Object {
                     return TRUE;
                 }
             }
-            
+
             return FALSE;
         }));
-        
+
         $cache->save($key, $classes);
-        
+
         return $classes;
     }
-    
+
     /**
      * Runs the application
      *
      * This method should implement the application processing logic.
      */
     abstract public function run();
-    
-    
+
+
     /**
      * Includes the boot file in an isolated namespace
      */

@@ -38,7 +38,7 @@ use Loops\Misc;
  * To define a module, a class has to be placed in the
  * Loops\Application\LoopsAdmin namespace. The classname should be the
  * camelized name (according to Loops\Misc::camelize) of the module name.
- * 
+ *
  * e.g. mymodule    -> Loops\Application\LoopsAdmin\Mymodule
  *      test_module -> Loops\Application\LoopsAdmin\TestModule
  *
@@ -53,7 +53,7 @@ use Loops\Misc;
  *     namespace Loops\Application\LoopsAdmin;
  *
  *     use Loops\Object;
- *     
+ *
  *     class Mymodule extends Object {
  *     }
  * </code>
@@ -92,7 +92,7 @@ use Loops\Misc;
  * recognized. The \@Action annotation should pass help about its
  * functionality. This help message will be displayed at an appropiate place
  * inside a bigger help message when requested.
- * 
+ *
  * <code>
  *     namespace Loops\Application\LoopsAdmin;
  *
@@ -147,7 +147,7 @@ use Loops\Misc;
  * replaced with underscores.
  * Therefore the argument names of the action method should match the flag
  * names (with dashes being replaced by underscores).
- * 
+ *
  * You also have access to the following arguments names:
  * __arguments -> any additional arguments that were passed on the command
  *                line
@@ -198,11 +198,11 @@ class LoopsAdmin extends CliApplication {
         if(is_integer($options)) {
             return $options;
         }
-        
+
         // extract and remove special vars
         $instance = $options["__instance"];
         $method   = $options["__method"];
-        
+
         unset($options["__instance"]);
         unset($options["__method"]);
 
@@ -214,36 +214,36 @@ class LoopsAdmin extends CliApplication {
             return $this->printError($e->getMessage());
         }
     }
-    
+
     /**
      * replaces dashes with underscore in keys of an array
      */
     private static function adjustOptions(array $options) {
         $result = [];
-        
+
         foreach($options as $key => $value) {
             $result[str_replace("-", "_", $key)] = $value;
         }
-        
+
         return $result;
     }
-    
+
     /**
      * Idents and chunk splits a text
      */
     private function ident($text, $length = 4, $chunk = 76, $break = "\n") {
         $lines = [];
-        
+
         foreach(explode($break, $text) as $line) {
             $text = trim(wordwrap($line, $chunk - $length, $break));
             foreach(explode($break, $text) as $part) {
                 $lines[] = str_repeat(" ", $length).$part;
             }
         }
-        
+
         return implode($break, $lines);
     }
-    
+
     /**
      * Implements parsing of a modules action
      *
@@ -258,18 +258,18 @@ class LoopsAdmin extends CliApplication {
             $message .= "    {$this->command} ".implode(" ", array_merge($this->arguments, [ "help" ]));
             return $this->printError($message);
         }
-        
+
         $module = array_shift($arguments);
-        
+
         // check if we are in help mode
         $is_help = ($module == "help");
-        
+
         if($is_help) {
             if(!$arguments) {
                 $modules = [];
                 if(class_exists("Loops\Application\LoopsAdmin\Cache")) $modules[] = "cache";
                 if(class_exists("Loops\Application\LoopsAdmin\Jobs"))  $modules[] = "jobs";
-                
+
                 $message  = "Welcome to the Loops admin.\n";
                 $message .= "\n";
                 $message .= "You can run Loops internal commands via this interface.\n";
@@ -295,32 +295,32 @@ class LoopsAdmin extends CliApplication {
                 $message .= "Available flags:";
                 return $this->printHelp($message);
             }
-            
+
             // help for this module requested
             $module = array_shift($arguments);
         }
-        
+
         $classname = "Loops\Application\LoopsAdmin\\".Misc::camelize($module);
-        
+
         if(!class_exists($classname)) {
             return $this->printError("Module not found: $module");
         }
-        
+
         $annotations = $this->getLoops()->getService("annotations")->get($classname);
-        
+
         if(!$arguments) {
             if($is_help) {
                 if(!$help = $annotations->findFirst("Admin\Help")) {
                     return $this->printError("Module '$module' does not define a help message.");
                 }
-                
+
                 $actions = [];
-                
+
                 foreach($annotations->methods as $method => $method_annotations) {
                     if(!$method_annotations->findFirst("Admin\Action")) continue;
                     $actions[] = Misc::underscore($method);
                 }
-                
+
                 $message  = "Help for module '$module':\n";
                 $message .= "\n";
                 $message .= $this->ident($help->help)."\n";
@@ -343,24 +343,24 @@ class LoopsAdmin extends CliApplication {
                 return $this->printError("Action not specified for module '$module'.");
             }
         }
-        
+
         $action = array_shift($arguments);
         $method = lcfirst(Misc::camelize($action));
-        
+
         if(empty($annotations->methods->$method) || !$action_annotation = $annotations->methods->$method->findFirst("Admin\Action")) {
             return $this->printError("Module '$module' does not support action: $action");
         }
-        
+
         $instance = new $classname($this->getLoops());
-        
+
         if($action_annotation->init_flags) {
             if(!method_exists($instance, $action_annotation->init_flags)) {
                 throw new Exception("Failed to init flags. Method '{$action_annotation->init}' is not defined.");
             }
-            
+
             Misc::reflectionFunction([$instance, $action_annotation->init_flags], [$this->flags]);
         }
-        
+
         if($is_help) {
             if(!$help = $annotations->methods->$method->findFirst("Admin\Help")) {
                 return $this->printError("Action '$action' of module '$module' does not define a help message.");
@@ -379,7 +379,7 @@ class LoopsAdmin extends CliApplication {
             $message .= "Available flags:";
             return $this->printHelp($message);
         }
-        
+
         try {
             $result = $this->flags->parse($this->arguments, !$strict, FALSE);
         }
@@ -391,21 +391,21 @@ class LoopsAdmin extends CliApplication {
             $message .= "    {$this->command} help $module $action";
             return $this->printError($message);
         }
-        
+
         $result = parent::parse();
-        
+
         if(is_integer($result)) {
             $this->printError("test");
             return $result;
         }
-        
+
         $result["__arguments"] = $arguments;
         $result["__module"]    = $module;
         $result["__action"]    = $action;
-        
+
         $result["__instance"]  = $instance;
         $result["__method"]    = $method;
-        
+
         return $result;
     }
 }

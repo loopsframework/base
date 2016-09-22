@@ -38,7 +38,7 @@ use ReflectionMethod;
  * Template engines can be implemented via plugins.
  * The selected plugin for a template file will be selected based on the file extension.
  * It is possible but not recommended to use different template engines for different parts (objects) of a rendered page.
- * 
+ *
  */
 class Renderer extends Service {
     private $views = [];
@@ -46,30 +46,30 @@ class Renderer extends Service {
     private $appearance_stack = [];
     private $registered_plugins = [];
     private $extra_appearances = [];
-    
+
     protected static $default_config = [ "view_dir" => [ "views" ] ];
-    
+
     /**
      * @ReadOnly
      */
     protected $view_dir;
-    
+
     public function __construct($view_dir = [], Loops $loops = NULL) {
         parent::__construct($loops);
-        
+
         $this->view_dir = array_map(function($dir) {
             return Misc::fullPath($dir, $this->getLoops()->getService("application")->app_dir);
         }, (array)$view_dir);
-        
+
         $this->view_dir = array_filter($this->view_dir, "is_dir");
-        
+
         $loops_views = realpath(__DIR__."/../../../views");
-        
+
         if(!in_array($loops_views, $this->view_dir)) {
             $this->view_dir[] = $loops_views;
         }
     }
-    
+
     /**
      * Manually register a renderer plugin (by classname)
      *
@@ -81,7 +81,7 @@ class Renderer extends Service {
     public function registerRenderPlugin($name, $classname) {
         $this->registered_plugins[$name] = $classname;
     }
-    
+
     /**
      * Adds an optional appearance tag that will be used for all render calls.
      *
@@ -122,12 +122,12 @@ class Renderer extends Service {
             $cache->save($key, $this->views);
         }
     }
-    
+
     /**
      * Returns the render output for an object or variable
      *
      * The formal rules of the rendering process are explained here but for a more practical explanation, please consult the Loops user manual.
-     * 
+     *
      * Step 1 - Appearance tag compilation
      *
      * Rules:
@@ -171,7 +171,7 @@ class Renderer extends Service {
      *  The service has to implement the Loops\Renderer\RenderPluginInterface.
      *  If $object is traversable, the renderer will register all key => value pairs with the template engine.
      *  Afterwards, the following additionals variable will be registered:
-     *  
+     *
      *  Basic helper:
      *   "this": Set to the $object itselft
      *   "stack": An array of all currently rendered $objects. $stack[0] is the same as $object
@@ -188,10 +188,10 @@ class Renderer extends Service {
      *   During the rendering process, the render method may be called again and with different parameters.
      *   There is no recursion protection.
      *   The output of the template engine will be returned
-     *   
      *
-     * @todo Move convenience variables into the Application class + add a method here to set them 
-     *  
+     *
+     * @todo Move convenience variables into the Application class + add a method here to set them
+     *
      * @param mixed $object The object or variable that should be rendered
      * @param string|array<string>|TRUE An array of forced appearance tags (or a single appearance tag). The list will accumulate on nested requests.
      * @param string|array<string>|TRUE An array of appearance tags (or a single appearance tag) that will be REMOVED from the currently accumulated forced and/or optional appearance list.
@@ -211,26 +211,26 @@ class Renderer extends Service {
             if($pos == 3) $clear = [];
             if($pos == 4) $optional = [];
         }
-        
+
         //prepare
         $appearance = array_filter(is_array($appearance) ? $appearance : explode(".", (string)$appearance));
-        
+
         list($current_appearance, $current_optional) = end($this->appearance_stack) ?: [[],[]];
-        
+
         if($fallback === TRUE) {
             $optional = $current_appearance;
         }
-        
+
         $current_appearance = array_diff($current_appearance, $appearance);
         $current_appearance = array_merge($current_appearance, $appearance);
 
         if($optional) {
             $optional = array_filter(is_array($optional) ? $optional : explode(".", (string)$optional));
-            
+
             $current_appearance = array_unique(array_merge($current_appearance, $optional));
             $current_optional   = array_unique(array_merge($current_optional, $optional));
         }
-        
+
         if($clear) {
             if($clear === TRUE) {
                 $current_appearance = $appearance;
@@ -238,7 +238,7 @@ class Renderer extends Service {
             }
             else {
                 $clear = array_filter(is_array($clear) ? $clear : explode(".", (string)$clear));
-                
+
                 $current_appearance = array_diff($current_appearance, $clear);
                 $current_optional   = array_diff($current_optional, $clear);
             }
@@ -249,12 +249,12 @@ class Renderer extends Service {
             $current_optional = array_unique($current_optional);
             $current_appearance = array_unique(array_merge($current_appearance, $current_optional));
         }
-        
+
         $select_appearance = array_unique(array_merge($current_appearance, $this->extra_appearances));
         $select_optional   = array_unique(array_merge($current_optional, $this->extra_appearances));
-        
+
         $cache_key = FALSE;
-        
+
         //check cache
         if($object instanceof CacheInterface) {
             if($object->isCacheable()) {
@@ -267,7 +267,7 @@ class Renderer extends Service {
                 }
             }
         }
-        
+
         //resolve file
         if(is_object($object)) {
             $template = $this->resolveObject($object, $select_appearance, $select_optional);
@@ -284,9 +284,9 @@ class Renderer extends Service {
 
         if(!$template) {
             $type = str_replace(" ", "", is_object($object) ? get_class($object) : gettype($object));
-            
+
             $error = "Failed to find a template for object of type '$type'";
-            
+
             if($object instanceof CustomizedRenderInterface && $templatename = $object->getTemplateName()) {
                 $error .= " with custom template '$templatename'";
             }
@@ -294,31 +294,31 @@ class Renderer extends Service {
             if($object instanceof ElementInterface) {
                 $error .= " and with loopsid '".$object->getLoopsId()."'";
             }
-            
+
             $error .= ".";
 
             throw new RenderException($error, $object, $select_appearance, array_diff($select_appearance, $select_optional));
         }
-        
+
         //fire event if available
         if(is_object($object)) {
             static $event_fired = [];
-            
+
             $hash = spl_object_hash($object);
-            
+
             if(empty($event_fired[$hash]) && method_exists($object, "fireEvent")) {
                 $object->fireEvent("Renderer\onRender");
                 $event_fired[$hash] = TRUE;
             }
         }
-        
+
         //start preparing the rendering process
         list($plugin_name, $folder, $file, $appearance) = $template;
-        
+
         $current_optional = array_diff($current_optional, $appearance);
-        
+
         array_push($this->appearance_stack, [ $current_appearance, $current_optional ]);
-        
+
         $added = FALSE;
         if(!$this->stack || ($this->stack[0] !== $object)) {
             $added = TRUE;
@@ -328,126 +328,126 @@ class Renderer extends Service {
         try {
             //prepare template variables
             $vars = [];
-            
+
             if(is_object($object) || is_array($object)) {
                 foreach($object as $key => $value) {
                     $vars[$key] = $value;
                 }
             }
-            
+
             $vars["this"]   = $object;
             $vars["loops"]  = $loops = $this->getLoops();
             $vars["stack"]  = $this->stack;
-            
+
             if($loops->hasService("web_core")) {
                 $vars["domain"] = $loops->getService("web_core")->base_url;
             }
-            
+
             if($loops->hasService("request")) {
                 $vars["query"]  = $loops->getService("request")->getQuery();
             }
-        
+
             //get plugin from Loops Context
             $servicename = $plugin_name."_renderer";
-            
+
             $plugin = $this->getLoops()->getService($servicename);
-            
+
             if(!($plugin instanceof RenderPluginInterface)) {
                 throw new Exception("Renderplugin '$plugin_name' (Service: $servicename) must implement 'Loops\Renderer\RenderPluginInterface'.");
             }
-            
+
             foreach($vars as $key => $value) {
                 $plugin->addVar($key, $value);
             }
-        
+
             $result = $plugin->render($folder, $file);
         }
         finally {
             if($added) {
                 array_shift($this->stack);
             }
-            
+
             array_pop($this->appearance_stack);
         }
 
         if($cache_key) {
             $cache->save($cache_key, $result);
         }
-        
+
         return $result;
     }
-    
+
     private function _resolve(&$views, $loopsidparts, $appearance, $force) {
         if($loopsidparts) {
             $key = "-".array_shift($loopsidparts);
-            
+
             if(!array_key_exists($key, $views)) {
                 return FALSE;
             }
-            
+
             return $this->_resolve($views[$key], $loopsidparts, $appearance, $force);
         }
-        
+
         while($appearance) {
             $key = ".".array_shift($appearance);
-            
+
             if(!array_key_exists($key, $views)) {
                 continue;
             }
-            
+
             if($result = $this->_resolve($views[$key], $loopsidparts, $appearance, $force)) {
                 return $result;
             }
         }
-        
+
         if(array_key_exists(".", $views) && !array_diff($force, $views["."][3])) {
             return $views["."];
         }
-        
+
         return FALSE;
     }
-    
+
     private function resolveClass($type, $appearance, $optional) {
         if(!array_key_exists($type, $this->views)) {
             return FALSE;
         }
-        
+
         return $this->_resolve($this->views[$type], [], $appearance, array_diff($appearance, $optional));
     }
-    
+
     private function resolveOther($var, $appearance, $optional) {
         $type = str_replace(" ", "", strtolower(gettype($var)));
-        
+
         if($result = $this->resolveClass($type, $appearance, $optional)) {
             return $result;
         }
-        
+
         if($result = $this->resolveClass("other", $appearance, $optional)) {
             return $result;
         }
-    
+
         return FALSE;
     }
-    
+
     private function resolveByPagePath(ElementInterface $object, $delegation, $loopsidparts, $appearance, $optional) {
         if($parent = $object->getParent()) {
             array_unshift($loopsidparts, $object->getName());
-            
+
             if(!$object::isPage()) {
                 if($result = $this->resolveByPagePath($parent, $delegation, $loopsidparts, $appearance, $optional)) {
                     return $result;
                 }
             }
-            
+
             array_shift($loopsidparts);
         }
-        
+
         if($loopsidparts) {
             $classname = get_class($object);
-            
+
             if($object instanceof CustomizedRenderInterface && $templatename = $object->getTemplateName()) {
                 $templatename = str_replace("/", "\\", $templatename);
-                
+
                 if(array_key_exists($templatename, $this->views)) {
                     return $this->_resolve($this->views[$templatename], $loopsidparts, $appearance, array_diff($appearance, $optional));
                 }
@@ -455,11 +455,11 @@ class Renderer extends Service {
             else {
                 do {
                     $templatename = strtolower($classname);
-                    
+
                     if(!array_key_exists($templatename, $this->views)) {
                         continue;
                     }
-                    
+
                     if($result = $this->_resolve($this->views[$templatename], $loopsidparts, $appearance, array_diff($appearance, $optional))) {
                         return $result;
                     }
@@ -469,7 +469,7 @@ class Renderer extends Service {
 
         return FALSE;
     }
-    
+
     private function resolveObject($object, $appearance, $optional) {
         //try to find an appearance of the elements page based on the elements loopsid
         if(is_object($object) && $object instanceof ElementInterface) {
@@ -477,20 +477,20 @@ class Renderer extends Service {
                 return $result;
             }
         }
-        
+
         $classname = is_string($object) ? $object : get_class($object);
-        
+
         if($object instanceof CustomizedRenderInterface) {
             if($delegation = $object->delegateRender()) {
                 return $this->resolveObject($delegation, $appearance, $optional);
             }
-            
+
             $templatename = str_replace("/", "\\", $object->getTemplateName()) ?: strtolower($classname);
         }
         else {
             $templatename = strtolower($classname);
         }
-        
+
         //try to find a class template for the object
         if($result = $this->resolveClass($templatename, $appearance, $optional)) {
             return $result;
@@ -500,7 +500,7 @@ class Renderer extends Service {
         if($classname = get_parent_class($classname)) {
             return $this->resolveObject($classname, $appearance, $optional);
         }
-        
+
         //try to render default
         if($templatename != "object") {
             return $this->resolveObject("object", $appearance, $optional);
@@ -508,7 +508,7 @@ class Renderer extends Service {
 
         return FALSE;
     }
-    
+
     private function scanViewDir($prefix, $path = "") {
         foreach(scandir("$prefix/$path") as $file) {
             if(in_array($file, [".", ".."])) continue;
@@ -520,17 +520,17 @@ class Renderer extends Service {
                 $dot = strrpos($file, ".");
                 if(!$dot) continue;
                 $ext = substr($file, $dot+1);
-                
+
                 $base = substr($file, 0, $dot);
 
                 $parts = explode(".", $base);
 
                 $parts2 = explode("-", array_shift($parts));
-                
+
                 $name = ltrim(str_replace("/", "\\", $path)."\\", "\\").array_shift($parts2);
 
                 $value = [$ext, $prefix, ltrim("$path/$file", "/"), $parts];
-                
+
                 $rec_set = function(&$array, &$parts, &$parts2) use ($value, &$rec_set) {
                     if($parts2) {
                         $key = "-".array_shift($parts2);
@@ -538,7 +538,7 @@ class Renderer extends Service {
                         $rec_set($array[$key], $parts, $parts2);
                         return;
                     }
-                    
+
                     if($parts) {
                         $key = ".".array_shift($parts);
                         if(empty($array[$key])) $array[$key] = [];
@@ -548,11 +548,11 @@ class Renderer extends Service {
                         $array["."] = $value;
                     }
                 };
-                
+
                 if(!array_key_exists($name, $this->views)) {
                     $this->views[$name] = [];
                 }
-                
+
                 $rec_set($this->views[$name], $parts, $parts2);
             }
         }

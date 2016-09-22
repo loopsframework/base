@@ -20,12 +20,12 @@ class ReadWrite {
      * @var string
      */
     public $setter;
-    
+
     /**
      * @var string
      */
     public $getter;
-    
+
     /**
      * @var array
      */

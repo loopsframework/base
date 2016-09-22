@@ -24,12 +24,12 @@ class EntityList extends Object {
      * @Required
      */
     public $entity;
-    
+
     /**
      * @var string
      */
     public $class = "Loops\Doctrine\EntityList";
-    
+
     /**
      * @var array<string>
      */

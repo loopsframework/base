@@ -16,34 +16,34 @@ class PHPSession extends Session {
         if($this->isStarted()) {
             $this->destroy();
         }
-        
+
         @session_start();
     }
-    
+
     public function isStarted() {
         return (session_status() == PHP_SESSION_ACTIVE);
     }
-    
+
     public function get($key) {
         return $this->has($key) ? unserialize($_SESSION[$key]) : NULL;
     }
-    
+
     public function has($key) {
         return array_key_exists($key, $_SESSION);
     }
-    
+
     public function delete($key) {
         unset($_SESSION[$key]);
     }
-    
+
     public function clear() {
         $_SESSION = [];
     }
-    
+
     public function set($key, $value) {
         $_SESSION[$key] = serialize($value);
     }
-    
+
     public function destroy() {
         session_write_close();
     }

@@ -26,39 +26,39 @@ class Subform extends Element {
      * @Expose
      */
     protected $subform;
-    
+
     public function __construct(Form $form, $validators = [], $filters = [], $context = NULL, Loops $loops = NULL) {
         $this->setForm($form);
         parent::__construct($this->subform->getValue(), $validators, $filters, $context, $loops);
         $this->addInternalFilter(new ArrayObjectConverter($this->getLoops()));
     }
-    
+
     /**
      * @Listen("Form\onValidate")
      */
     public function subformValidate($value) {
         return $this->subform->validate();
     }
-    
+
     /**
      * @Listen("Form\onCleanup")
      */
     public function doCleanup() {
         $this->subform->fireEvent("Form\onCleanup", [$this->subform]);
     }
-    
+
     public function setForm(Form $form) {
         $this->subform = $this->initChild("subform", $form);
         $this->subform->weak = TRUE;
         $this->value = $this->subform->getValue();
         $this->default = $this->value;
     }
-    
+
     public function setValue($value) {
         parent::setValue($value);
-        
+
         $subform_value = $this->subform->getValue();
-        
+
         foreach($this->subform->getFormElements() as $name => $child) {
             $child->setValue($this->value->offsetExists($name) ? $this->value->offsetGet($name) : NULL);
             $subform_value->offsetSet($name, $child->getValue(FALSE));
@@ -66,15 +66,15 @@ class Subform extends Element {
 
         return $this->value = $subform_value;
     }
-    
+
     public function getFormValue($strict = FALSE) {
         return $this->subform->getFormValue($strict);
     }
-    
+
     public function offsetExists($offset) {
         return parent::offsetExists($offset) ?: $this->subform->offsetExists($offset);
     }
-    
+
     public function offsetGet($offset) {
         return parent::offsetExists($offset) ? parent::offsetGet($offset) : $this->subform->offsetGet($offset);
     }

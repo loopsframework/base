@@ -25,7 +25,7 @@ class ErrorPage extends Page {
      * @ReadOnly
      */
     protected $status_code;
-    
+
     /**
      * @param integer $status_code The HTTP status code of the response
      * @param Loops A Loops context to use instead of the default one.
@@ -34,7 +34,7 @@ class ErrorPage extends Page {
         parent::__construct([], $loops);
         $this->status_code = $status_code;
     }
-    
+
     /**
      * Returns the page path
      *

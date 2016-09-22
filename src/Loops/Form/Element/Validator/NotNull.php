@@ -16,12 +16,12 @@ use Loops\Form\Element;
 
 class NotNull extends Validator {
     protected $null = TRUE;
-    
+
     function validate($value, Element $element) {
         if($value !== NULL) {
             return TRUE;
         }
-        
+
         $element->messages->add("This field can not be NULL.");
         return FALSE;
     }

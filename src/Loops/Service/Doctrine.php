@@ -24,58 +24,58 @@ class Doctrine extends Service {
      * @ReadOnly
      */
     protected $driver;
-    
+
     /**
      * @ReadOnly
      */
     protected $host;
-    
+
     /**
      * @ReadOnly
      */
     protected $port;
-    
+
     /**
      * @ReadOnly
      */
     protected $user;
-    
+
     /**
      * @ReadOnly
      */
     protected $password;
-    
+
     /**
      * @ReadOnly
      */
     protected $dbname;
-    
+
     /**
      * @ReadOnly
      */
     protected $path;
-    
+
     /**
      * @ReadOnly
      */
     protected $devmode;
-    
+
     /**
      * @ReadOnly
      */
     protected $entity_prefix    = "Entities\\";
-    
+
     /**
      * @ReadOnly
      */
     protected $entity_manager;
-    
+
     public function __construct($driver = NULL, $dbname = NULL, $host = NULL, $port = NULL, $user = NULL, $password = NULL, $path = NULL, $devmode = TRUE, $entity_prefix = "Entities\\", Loops $loops = NULL) {
         parent::__construct($loops);
-        
+
         $loops          = $this->getLoops();
         $application    = $loops->hasService('application') ? $loops->getService('application') : NULL;
-        
+
         //check if mysql is linked via docker - configure default options if yes
         if(getenv('MYSQL_PORT') && preg_match('/^(.*?):\/\/(.*?):(.*?)$/', getenv('MYSQL_PORT'), $match)) {
             if($driver   === NULL) $driver   = 'pdo_mysql';
@@ -85,7 +85,7 @@ class Doctrine extends Service {
             if($password === NULL) $password = getenv('MYSQL_ENV_MYSQL_PASSWORD') ?: getenv('MYSQL_ENV_MYSQL_ROOT_PASSWORD');
             if($dbname   === NULL) $dbname   = getenv('LOOPS_DATABASE') ?: (getenv('MYSQL_ENV_MYSQL_DATABASE') ?: 'loops');
         }
-        
+
         //check if postgres is linked via docker - configure default options if yes
         if(getenv('POSTGRES_PORT') && preg_match('/^(.*?):\/\/(.*?):(.*?)$/', getenv('POSTGRES_PORT'), $match)) {
             if($driver   === NULL) $driver   = 'pdo_pgsql';
@@ -95,13 +95,13 @@ class Doctrine extends Service {
             if($password === NULL) $password = getenv('POSTGRES_ENV_POSTGRES_PASSWORD');
             if($dbname   === NULL) $dbname   = getenv('LOOPS_DATABASE') ?: 'loops';
         }
-        
+
         //default options - sqlite with database in cache directory
         if($driver === NULL) $driver = "pdo_sqlite";
         if($host   === NULL) $host   = "localhost";
         if($dbname === NULL) $dbname = "loops";
         if($path   === NULL) $path   = $application ? "{$application->cache_dir}/$dbname.sqlite": "$dbname.sqlite";
-        
+
         //set vars as read-only for reference
         $this->driver        = $driver;
         $this->host          = $host;
@@ -112,7 +112,7 @@ class Doctrine extends Service {
         $this->path          = $path;
         $this->devmode       = $devmode;
         $this->entity_prefix = $entity_prefix;
-        
+
         //setup doctrine entity maneger
         $databaseConfig = [ "driver"    => $driver,
                             "host"      => $host,
@@ -120,13 +120,13 @@ class Doctrine extends Service {
                             "password"  => $password,
                             "dbname"    => $dbname,
                             "path"      => $path ];
-        
+
         $doctrineConfig = Setup::createAnnotationMetadataConfiguration( [ "{$application->app_dir}/inc/".str_replace("\\", "/", $entity_prefix) ], // $paths
                                                                         $devmode,
                                                                         "{$application->cache_dir}/doctrine_proxies",
                                                                         $loops->hasService("cache") ? $loops->getService("cache") : NULL,
                                                                         $loops->getService("doctrine_annotation_reader") instanceof SimpleAnnotationReader );
-        
+
         //autoloading of proxy classes - needed when unserializing doctrine entities
         //(doctrine should take care about this but is doesn't)
         spl_autoload_register(function($classname) use ($application) {
@@ -136,10 +136,10 @@ class Doctrine extends Service {
                 include("{$application->cache_dir}/doctrine_proxies/$file");
             };
         });
-        
+
         $this->entity_manager = EntityManager::create($databaseConfig, $doctrineConfig);
     }
-    
+
     public function offsetGet($key) {
         if(parent::offsetExists($key)) {
             return parent::offsetGet($key);
@@ -147,15 +147,15 @@ class Doctrine extends Service {
 
         return $this->repository(Misc::camelize($key));
     }
-    
+
     public function __call($name, $arguments) {
         return call_user_func_array([$this->entity_manager, $name], $arguments);
     }
-    
+
     public function metadata($entity) {
         return $this->entity_manager->getMetadataFactory()->getMetadataFor(is_string($entity) ? $this->entity_prefix.$entity : get_class($entity));
     }
-    
+
     public function repository($entity) {
         return $this->entity_manager->getRepository(is_string($entity) ? $this->entity_prefix.$entity : get_class($entity));
     }

@@ -19,10 +19,10 @@ class ArrayConfig extends ArrayObject {
             if(!is_array($value)) {
                 continue;
             }
-            
+
             $array[$key] = new ArrayConfig($value);
         }
-        
+
         parent::__construct($array);
     }
 }

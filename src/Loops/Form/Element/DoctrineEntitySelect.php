@@ -27,27 +27,27 @@ class DoctrineEntitySelect extends Element {
      * @ReadWrite
      */
     protected $nullable;
-    
+
     /**
      * @ReadOnly
      * @Expose
      */
     protected $entitylist;
-    
+
     public function __construct($entitylist, $default = NULL, $nullable = TRUE, $validators = [], $filters = [], $context = NULL, Loops $loops = NULL) {
         parent::__construct($default, $validators, $filters, $context, $loops);
 
         if(is_string($entitylist)) {
             $entitylist = new FilteredEntityList($entitylist, NULL, [], 10, NULL, [], NULL, $this);
         }
-        
+
         if(!($entitylist instanceof EntityList)) {
             throw new Exception("Passed EntityList must be of type 'Loops\Doctrine\EntityList'");
         }
-        
+
         $this->nullable = $nullable;
         $this->entitylist = $entitylist;
-        
+
         $this->addInternalFilter(new DoctrineEntityFilter($entitylist, $loops));
     }
 }

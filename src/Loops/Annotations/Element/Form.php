@@ -19,11 +19,11 @@ use Loops\Annotations\Object;
  */
 class Form extends Object {
     /**
-     * @var string 
+     * @var string
      * @Required
      */
     public $class;
-    
+
     /**
      * @var string|bool
      */

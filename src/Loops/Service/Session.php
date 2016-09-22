@@ -20,7 +20,7 @@ class Session extends PluginService {
     protected static $classname         = "Loops\Session\%Session";
     protected static $interface         = "Loops\Session\SessionInterface";
     protected static $default_plugin    = "PHP";
-    
+
     public static function getService(ArrayObject $config, Loops $loops) {
         $plugin = parent::getService($config, $loops);
         $plugin->start(0);

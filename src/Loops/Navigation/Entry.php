@@ -35,7 +35,7 @@ abstract class Entry extends Element {
      * It can have various formats depending on the type of the entry.
      * The default template expects a relative path to the applications
      * base url.
-     * 
+     *
      * @Expose
      * @ReadWrite
      */
@@ -43,7 +43,7 @@ abstract class Entry extends Element {
 
     /**
      * @var string $title A displayable title for this entry
-     * 
+     *
      * @Expose
      * @ReadWrite
      */
@@ -58,7 +58,7 @@ abstract class Entry extends Element {
      */
     public function __construct($link, $title, $context = NULL, Loops $loops = NULL) {
         parent::__construct($context, $loops);
-        
+
         $this->link           = $link;
         $this->title          = $title;
     }

@@ -24,34 +24,34 @@ class Breadcrumbs extends Element {
         $pagepath = WebCore::getPagePathFromClassname(get_class($core->page), $core->page_parameter);
         return parent::getCacheId().$pagepath;
     }
-    
+
     public function __construct(ElementInterface $context, $page_parameter = NULL, Loops $loops = NULL) {
         parent::__construct($context, $loops);
 
         $loops = $this->getLoops();
         $annotations = $loops->getService("annotations");
-        
+
         if($page_parameter === NULL) {
             $page_parameter = $loops->getService("web_core")->page_parameter;
         }
-        
+
         $reflection = new ReflectionClass(get_class($context));
-        
+
         $entries = [];
-        
+
         do {
             $classname = $reflection->getName();
-            
+
             $annotation_set = $annotations->getStrict($classname);
-            
+
             $annotation = $annotation_set->findFirst("Navigation\PageEntry");
             $breadcrumb_annotation = $annotation_set->findFirst("Navigation\Breadcrumb");
             $annotation_title = $annotation_set->findFirst("Navigation\Title");
-            
+
             if($breadcrumb_annotation && $breadcrumb_annotation->ignore) {
                 continue;
             }
-            
+
             if($breadcrumb_annotation && $breadcrumb_annotation->title) {
                 $title = $breadcrumb_annotation->title;
             }
@@ -64,21 +64,21 @@ class Breadcrumbs extends Element {
             else {
                 continue;
             }
-            
+
             $entry = new PageEntry(substr($classname, 6), $page_parameter, $title, $loops);
-            
+
             if($annotation && $annotation->link) {
                 $entry->link = WebCore::getPagePathFromClassname("Pages\\".$annotation->link, $page_parameter);
             }
 
             $entries[] = $entry;
         } while($reflection = $reflection->getParentClass());
-        
+
         foreach(array_reverse($entries) as $key => $entry) {
             $this->addChild($key, $entry);
         }
     }
-    
+
     public function getEntries() {
         return $this->getGenerator(TRUE, TRUE, "Loops\Navigation\PageEntry");
     }

@@ -20,7 +20,7 @@ class ReadOnly {
      * @var string
      */
     public $getter;
-    
+
     /**
      * @var array
      */

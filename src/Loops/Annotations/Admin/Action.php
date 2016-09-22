@@ -21,12 +21,12 @@ class Action extends Help {
      * @Required
      */
     public $help;
-    
+
     /**
      * @var string
      */
     public $arguments = "";
-    
+
     /**
      * @var string
      */

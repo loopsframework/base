@@ -31,7 +31,7 @@ use Loops\Annotations\Access\Expose;
  * Loops\Element inherits from Loops\Object and implements all its magic Loops behaviour. It also implements the
  * Loops\Renderer\CacheInterface. The behaviour of this interface is quickly configurable by settings default properties or
  * overriding methods.
- * 
+ *
  */
 abstract class Element extends Object implements ElementInterface, CacheInterface {
     /**
@@ -40,21 +40,21 @@ abstract class Element extends Object implements ElementInterface, CacheInterfac
      * @ReadOnly
      */
     protected $delegate_action = FALSE;
-    
+
     /**
      * @var bool Used by the action method to specify if the element accepts the request on default.
      *
      * See method action for details.
      */
     protected $direct_access = FALSE;
-    
+
     /**
      * @var bool Used by the action method to specify if the element accepts the request on default during an ajax request.
      *
      * See method action for details.
      */
     protected $ajax_access = FALSE;
-    
+
     /**
      * @var integer The renderer cache lifetime of this object in seconds.
      * @ReadWrite
@@ -63,27 +63,27 @@ abstract class Element extends Object implements ElementInterface, CacheInterfac
      * 0 defines that the cache never expires.
      */
     protected $cache_lifetime = -1;
-    
+
     /**
      * @var string Magic access to ->getLoopsId()
      * @Expose
      * @ReadOnly("getLoopsId")
      */
     protected $loopsid;
-    
+
     /**
      * @var string Magic access to ->getPagePath()
      * @Expose
      * @ReadOnly("getPagePath")
      */
     protected $pagepath;
-    
+
     /**
      * @var mixed The creation context (see constructor)
      * @ReadOnly
      */
     protected $context;
-    
+
     /**
      * Can be returned from action methods for convinience
      */
@@ -91,7 +91,7 @@ abstract class Element extends Object implements ElementInterface, CacheInterfac
 
     private $__name           = NULL;
     private $__parent         = NULL;
-    
+
     /**
      * The contructror
      *
@@ -109,7 +109,7 @@ abstract class Element extends Object implements ElementInterface, CacheInterfac
         $this->context = $context;
         parent::__construct($loops);
     }
-    
+
     /**
      * Generate the Loops id of this object.
      *
@@ -123,19 +123,19 @@ abstract class Element extends Object implements ElementInterface, CacheInterfac
         if($this->__parent) {
             return $this->__parent->__getLoopsId($this->__name)."-".$this->__name;
         }
-        
+
         return spl_object_hash($this);
     }
-    
+
     /**
      * Returns if the object is cacheable based on the cache_lifetime property.
-     * 
+     *
      * @return bool TRUE if the renderer chache should be used for this object.
      */
     public function isCacheable() {
         return $this->cache_lifetime >= 0;
     }
-    
+
     /**
      * Return the cacheid
      *
@@ -147,7 +147,7 @@ abstract class Element extends Object implements ElementInterface, CacheInterfac
     public function getCacheId() {
         return $this->getLoopsId();
     }
-    
+
     /**
      * Returns the cache lifetime in seconds (=property cache_lifetime)
      *
@@ -156,14 +156,14 @@ abstract class Element extends Object implements ElementInterface, CacheInterfac
     public function getCacheLifetime() {
         return $this->cache_lifetime;
     }
-    
+
     /**
      * {@inheritdoc}
      */
     public function getLoopsId() {
         return $this->__getLoopsId();
     }
-    
+
     /**
      * Adds an element into the hierarchy.
      *
@@ -175,7 +175,7 @@ abstract class Element extends Object implements ElementInterface, CacheInterfac
     public function addChild($name, Element $child) {
         $this->offsetSet($name, $child);
     }
-    
+
     /**
      * Internal use, an Element instances __parent and __name property are automatically updated
      *
@@ -189,7 +189,7 @@ abstract class Element extends Object implements ElementInterface, CacheInterfac
             if($detach && $child->__parent && $child->__parent !== $this) {
                 $child->detach();
             }
-            
+
             if(!$child->__parent) {
                 $child->__parent = $this;
                 $child->__name = $name;
@@ -197,7 +197,7 @@ abstract class Element extends Object implements ElementInterface, CacheInterfac
         }
         return $child;
     }
-    
+
     /**
      * Automatically initializes child elements in case they were not initialized yet
      *
@@ -207,7 +207,7 @@ abstract class Element extends Object implements ElementInterface, CacheInterfac
         $value = parent::offsetGet($offset);
         return $offset === "context" ? $value : $this->initChild($offset, $value);
     }
-    
+
     /**
      * Automatically initailizes child elements in case they were not initialized yet
      *
@@ -220,7 +220,7 @@ abstract class Element extends Object implements ElementInterface, CacheInterfac
         parent::offsetSet($offset, $value);
         $this->initChild($offset, $value, TRUE);
     }
-    
+
     /**
      * Automatically detaches child elements if they belong to this element
      *
@@ -228,21 +228,21 @@ abstract class Element extends Object implements ElementInterface, CacheInterfac
      */
     public function offsetUnset($offset) {
         $detach = NULL;
-        
+
         if(parent::offsetExists($offset)) {
             $child = parent::offsetGet($offset);
             if($child instanceof Element && $child->__parent === $this) {
                 $detach = $child;
             }
         }
-        
+
         parent::offsetUnset($offset);
-        
+
         if($detach) {
             $detach->detach();
         }
     }
-    
+
     /**
      * A class internal way of iterating over class properties.
      *
@@ -276,22 +276,22 @@ abstract class Element extends Object implements ElementInterface, CacheInterfac
      * 2. Take the first parameter and check if there is another Loops\Element instance at the offset defined by the parameter (->offsetExists($param) & ->offsetGet($param))
      * If such object exists execute that objects action, pass the rest of the parameter and use its return value, continue if it was NULL or FALSE.
      * 3. Check if the element defines a property delegate_action and, prepend it to the action parameters and apply step 2.
-     * 
+     *
      * @param array $parameter The action parameter.
      * @return mixed The processed value
      */
     public function action($parameter) {
         $result = FALSE;
-        
+
         if($parameter) {
             $name = $parameter[0];
 
             $method_name = $name."Action";
-            
+
             if(method_exists($this, $method_name)) {
                 $result = $this->$method_name(array_slice($parameter, 1));
             }
-            
+
             if(in_array($result, [FALSE, NULL], TRUE)) {
                 if($parameter && $this->offsetExists($name)) {
                     $child = $this->offsetGet($name);
@@ -301,7 +301,7 @@ abstract class Element extends Object implements ElementInterface, CacheInterfac
                 }
             }
         }
-        
+
         if(in_array($result, [FALSE, NULL], TRUE)) {
             if($this->delegate_action) {
                 if($this->offsetExists($this->delegate_action)) {
@@ -312,7 +312,7 @@ abstract class Element extends Object implements ElementInterface, CacheInterfac
                 }
             }
         }
-        
+
         if(in_array($result, [FALSE, NULL], TRUE)) {
             if(!$parameter) {
                 if($this->direct_access) {
@@ -320,21 +320,21 @@ abstract class Element extends Object implements ElementInterface, CacheInterfac
                 }
                 else {
                     $loops = $this->getLoops();
-                    
+
                     if($loops->hasService("request") && $loops->getService("request")->isAjax() && $this->ajax_access) {
                         $result = TRUE;
                     }
                 }
             }
         }
-        
+
         if($result === TRUE) {
             $result = $this;
         }
 
         return $result;
     }
-    
+
     /**
      * Reset the internal caching mechanism of the parent element and name.
      * This may be needed if you want to assign the element on a different object.
@@ -345,12 +345,12 @@ abstract class Element extends Object implements ElementInterface, CacheInterfac
         if($this->__parent) {
             $this->__parent->offsetUnset($this->__name);
         }
-        
+
         $this->__parent = NULL;
         $this->__name = NULL;
         return $this;
     }
-    
+
     /**
      * Returns the parent elemenet
      *
@@ -359,7 +359,7 @@ abstract class Element extends Object implements ElementInterface, CacheInterfac
     public function getParent() {
         return $this->__parent ?: FALSE;
     }
-    
+
     /**
      * Returns the offset name with which this object can be accessed from its parent object.
      *
@@ -368,7 +368,7 @@ abstract class Element extends Object implements ElementInterface, CacheInterfac
     public function getName() {
         return $this->__parent ? $this->__name : FALSE;
     }
-    
+
     /**
      * Returns the page path of this object. (See documentation of Loops\ElementInterface for details)
      *
@@ -381,20 +381,20 @@ abstract class Element extends Object implements ElementInterface, CacheInterfac
         if(!$this->__parent) {
             return FALSE;
         }
-        
+
         $pagepath = $this->__parent->getPagePath();
-        
+
         if($pagepath === FALSE) {
             return FALSE;
         }
-        
+
         if($this->__parent->delegate_action == $this->__name) {
             return $pagepath;
         }
-        
+
         return ltrim(rtrim($pagepath, "/")."/".$this->__name, "/");
     }
-    
+
     /**
      * Returns FALSE on default
      *

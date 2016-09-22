@@ -20,7 +20,7 @@ use Loops\Form\Element\Filter\Text as TextFilter;
 
 class Number extends Text {
     public $null_if = [ "" ];
-    
+
     public function __construct($default = NULL, $validators = [], $filters = [], $context = NULL, Loops $loops = NULL) {
         parent::__construct($default, $validators, $filters, $context, $loops);
         $this->addInternalFilter(new NumberFilter($loops));

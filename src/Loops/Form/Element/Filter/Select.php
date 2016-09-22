@@ -17,20 +17,20 @@ use Loops\Form\Element\Filter;
 class Select extends Filter {
     private $elements;
     private $context;
-    
+
     public function __construct($elements = NULL, $context = NULL, Loops $loops = NULL) {
         $this->elements = $elements;
         $this->context = $context;
         parent::__construct($loops);
     }
-    
+
     public function filter($value) {
         $elements = $this->elements === NULL ? $this->context->elements : $this->elements;
-        
+
         if($value === NULL && $this->context->multiple) {
             $value = [];
         }
-        
+
         if(is_array($value)) {
             $value = array_intersect($value, array_keys($elements));
         }

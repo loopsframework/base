@@ -29,15 +29,15 @@ use Loops\Annotations\Access\Sleep;
  * <code>
  *     use Loops\Annotations\Event;
  *     use Loops\Misc\EventTrait;
- * 
+ *
  *     class Dog {
  *         trait EventTrait;
- *     
+ *
  *         /**
  *          * ("\@")Listen("onFeed")
  *          {@*}
  *         public $feed_callback;
- *     
+ *
  *         /**
  *          * ("\@")Listen("onFeed")
  *          {@*}
@@ -45,14 +45,14 @@ use Loops\Annotations\Access\Sleep;
  *             echo "Woof!";
  *         }
  *     }
- * 
+ *
  *     $bello = new Dog;
  *     $bello->feed_callback = function() { echo "Wooof!"; };
  *     $bello->addListener("onFeed", function() { echo "Woooof!"; });
  *     $bello->fireEvent("onFeed");
  * </code>
  *
- * It is also possible to notify other objects of events by using the bindEventObject method. 
+ * It is also possible to notify other objects of events by using the bindEventObject method.
  *
  * <code>
  *     use Loops\Annotations\Event;
@@ -65,10 +65,10 @@ use Loops\Annotations\Access\Sleep;
  *     class Park {
  *         trait EventTrait;
  *     }
- * 
+ *
  *     class Dog {
  *         trait EventTrait;
- *     
+ *
  *         /**
  *          * ("\@")Listen("onIntruderArrived")
  *          {@*}
@@ -78,7 +78,7 @@ use Loops\Annotations\Access\Sleep;
  *     }
  *
  *     $bello = new Dog;
- * 
+ *
  *     $villa = new House;
  *     $villa->bindEventObject($bello);
  *     $villa->fireEvent("onIntruderArrived");
@@ -87,7 +87,7 @@ use Loops\Annotations\Access\Sleep;
  *     $central_park->bindEventObject($bello);
  *     $central_park->fireEvent("onIntruderArrived");
  * </code>
- * 
+ *
  * @Sleep(exclude={"registered_events","annotated_events","bound_event_objects","bound_self","event_cache_state"})
  */
 trait EventTrait {
@@ -96,7 +96,7 @@ trait EventTrait {
     private $bound_event_objects = [];
     private $bound_self = FALSE;
     private $event_cache_state = [];
-    
+
     /**
      * Registers all event listener of an object to this object.
      *
@@ -123,7 +123,7 @@ trait EventTrait {
 
         $this->registered_events[$name][] = $callback;
     }
-    
+
     /**
      * Fires an event
      *
@@ -142,10 +142,10 @@ trait EventTrait {
         $this->registerAnnotatedEvents($name);
 
         $events = [];
-        
+
         foreach($this->annotated_events[$name] as $event) {
             list($is_method, $object, $key) = $event;
-            
+
             //if event is stored in a property
             if($is_method) {
                 $callable = [ $object, $key ];
@@ -158,16 +158,16 @@ trait EventTrait {
                     $callable = $object->$key;
                 }
             }
-            
+
             //allow NULL properties
             if($callable === NULL) {
                 continue;
             }
-            
+
             if(!is_callable($callable)) {
                 throw new Exception("Can not fire listener of event in property '$property' of class '".get_class($this)."'.");
             }
-            
+
             $events[] = $callable;
         }
 
@@ -178,9 +178,9 @@ trait EventTrait {
         if(!$events && $boolean_aggregate) {
             return $empty_is_true;
         }
-        
+
         $result = [];
-        
+
         foreach($events as $event) {
             $result[] = call_user_func_array($event, $arguments);
         }
@@ -188,22 +188,22 @@ trait EventTrait {
         if(!$boolean_aggregate) {
             return $result;
         }
-        
+
         foreach($result as $value) {
             if(is_callable($boolean_aggregate)) {
                 $value = $boolean_aggregate($value);
             }
-            
+
             if($value || ($null_is_true && $value === NULL)) {
                 continue;
             }
-            
+
             return FALSE;
         }
-        
+
         return TRUE;
     }
-    
+
     private function registerAnnotatedEvents($name) {
         if(in_array($name, $this->event_cache_state)) {
             return;
@@ -215,7 +215,7 @@ trait EventTrait {
         }
 
         $this->annotated_events[$name] = [];
-        
+
         foreach($this->bound_event_objects as $pair) {
             list($filter, $object) = $pair;
 
@@ -224,7 +224,7 @@ trait EventTrait {
             }
 
             $loops = $this instanceof Object ? $this->getLoops() : Loops::getCurrentLoops();
-            
+
             $annotations = $loops->getService("annotations")->get(get_class($object));
 
             foreach($annotations->methods->find("Listen") as $key => $annotationarray) {

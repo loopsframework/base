@@ -20,26 +20,26 @@ class RenderException extends Exception {
     public $proposed_template_names = [];
     public $appearances             = [];
     public $forced_appearances      = [];
-    
+
     public function __construct($message, $object, array $appearances = [], array $forced_appearances = []) {
         $this->object = $object;
         $this->appearances = $appearances;
         $this->forced_appearances = $forced_appearances;
-        
+
         //make a list of proposed template files - does not list up template names based on object inheritance
         $appearances = array_unique(array_merge($appearances, $forced_appearances));
-        
+
         $parts = [];
         $classes = [];
-        
+
         $this->custom_template = ($object instanceof CustomizedRenderInterface) ? $object->getTemplateName() : NULL;
-        
+
         if($this->custom_template) {
             $classes = [ $this->custom_template ];
         }
         else {
             $delegate = ($object instanceof CustomizedRenderInterface) ? $object->delegateRender() : NULL;
-            
+
             if($object instanceof ElementInterface) {
                 $child = NULL;
                 do {
@@ -50,7 +50,7 @@ class RenderException extends Exception {
                     else {
                         array_unshift($classes, str_replace("\\", "/", strtolower(get_class($delegate?:$object))));
                     }
-                    
+
                     $child = $object;
                 } while($object = $object->getParent());
             }
@@ -58,7 +58,7 @@ class RenderException extends Exception {
                 array_unshift($classes, str_replace("\\", "/", strtolower(is_object($object) ? get_class($object) : gettype($object))));
             }
         }
-        
+
         foreach($classes as $class) {
             for($i=0;$i<=count($appearances);$i++) {
                 $base = implode("-", array_merge([$class], $parts));
@@ -68,9 +68,9 @@ class RenderException extends Exception {
             }
             array_shift($parts);
         }
-        
+
         $this->proposed_template_names = array_unique($this->proposed_template_names);
-        
+
         parent::__construct($message);
     }
 }

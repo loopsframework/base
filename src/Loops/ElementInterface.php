@@ -58,14 +58,14 @@ interface ElementInterface extends ArrayAccess {
      * @return string The name of this element.
      */
     public function getName();
-    
+
     /**
      * Return the parent element in the hierarchy.
      *
      * @return object|NULL The parent object or NULL if this element does not have a parent.
      */
     public function getParent();
-    
+
     /**
      * Return an unique id based on the objects position in the hierarchy
      *
@@ -74,7 +74,7 @@ interface ElementInterface extends ArrayAccess {
      * @return string The unique id.
      */
     public function getLoopsId();
-    
+
     /**
      * Returns the page path of an object
      *
@@ -88,7 +88,7 @@ interface ElementInterface extends ArrayAccess {
      * @return string The URL with which this object can be addressed
      */
     public function getPagePath();
-    
+
     /**
      * Return if the object is a page or normal element.
      *

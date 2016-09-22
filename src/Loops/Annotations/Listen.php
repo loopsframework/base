@@ -23,7 +23,7 @@ class Listen {
      * @Required
      */
     public $value;
-    
+
     public function __construct($options) {
         if(empty($options) && get_class($this) != __CLASS__) {
             $this->value = substr(get_class($this), strlen(__CLASS__));

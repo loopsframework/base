@@ -48,7 +48,7 @@ trait SessionTrait {
         if($this->sessioninit) {
             return FALSE;
         }
-        
+
         //if the user didn't override the session id, use the loopsid
         if(!$this->sessionid) {
             $this->sessionid = $this->getLoopsId();
@@ -60,14 +60,14 @@ trait SessionTrait {
 
         //load from session or create default array
         $session = $this->getLoops()->getService("session")->get($this->sessionid) ?: new ArrayObject;
-        
+
         //add missing values
         foreach($this->getSessionVars() as $key) {
             if($session->offsetExists($key)) continue;
 
             $session->offsetSet($key, $this->$key);
         }
-        
+
         //fire the initialize event which may adjust the variable
         $r = $this->fireEvent("Session\onInit", [ $session ]);
 
@@ -78,25 +78,25 @@ trait SessionTrait {
 
         return $this->sessioninit = TRUE;
     }
-    
+
     private function getSessionVars() {
         static $cache = [];
 
         $classname = get_called_class();
-        
+
         if(array_key_exists($classname, $cache)) {
             return $cache[$classname];
         }
-        
+
         return $cache[$classname] = array_keys($this->getLoops()->getService("annotations")->get($classname)->properties->find("Session\SessionVar"));
     }
-    
+
     public function saveToSession() {
         $this->initFromSession();
 
         //new session object
         $session = new ArrayObject;
-        
+
         //initialize object from values
         foreach($this->getSessionVars() as $key) {
             $session->offsetSet($key, $this->$key);
@@ -104,7 +104,7 @@ trait SessionTrait {
 
         //fire session save event - may adjust the values
         $this->fireEvent("Session\onSave", [ $session ]);
-        
+
         //set in the session service
         $this->getLoops()->getService("session")->set($this->sessionid, $session);
     }
@@ -117,7 +117,7 @@ trait SessionTrait {
         }
 
         $this->getLoops()->session->delete($this->sessionid);
-        
+
         return TRUE;
     }
 }

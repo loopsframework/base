@@ -23,13 +23,13 @@ class Select extends Element {
      * @Expose
      */
     protected $elements;
-    
+
     /**
      * @ReadOnly
      * @Expose
      */
     protected $multiple;
-    
+
     public function __construct(array $elements, $multiple = FALSE, $force_numeric_keys = FALSE, $default = NULL, $validators = [], $filters = [], $context = NULL, Loops $loops = NULL) {
         if(!$force_numeric_keys) {
             //make sure elements are all scalar, or array_combine will not be possible
@@ -43,7 +43,7 @@ class Select extends Element {
                 }
             }
         }
-        
+
         if($default === NULL) {
             $default = $multiple ? [] : "";
         }

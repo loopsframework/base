@@ -19,7 +19,7 @@ class Number extends Validator {
         if(is_numeric($value)) {
             return TRUE;
         }
-        
+
         $element->messages->add("Value is not numeric.");
         return FALSE;
     }

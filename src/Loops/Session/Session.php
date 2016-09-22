@@ -15,7 +15,7 @@ abstract class Session implements SessionInterface {
     public function __get($key) {
         return $this->get($key);
     }
-    
+
     public function __isset($key) {
         return $this->has($key);
     }
@@ -23,7 +23,7 @@ abstract class Session implements SessionInterface {
     public function __unset($key) {
         $this->delete($key);
     }
-    
+
     public function __set($key, $value) {
         return $this->set($key, $value);
     }

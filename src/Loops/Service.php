@@ -32,7 +32,7 @@ use Loops\Misc\AccessTrait;
  * Define a service as non-shared.
  * <code>
  *     namespace Loops\Service;
- *     
+ *
  *     use Loops\Service;
  *
  *     class ExampleService2 extends Service {
@@ -45,9 +45,9 @@ use Loops\Misc\AccessTrait;
  * Example2:
  * <code>
  *     namespace Loops\Service;
- *     
+ *
  *     use Loops\Service;
- *     
+ *
  *     class ExampleService extends Service {
  *         protected static $shared = FALSE;
  *     }
@@ -132,22 +132,22 @@ abstract class Service extends Object implements ServiceInterface {
      * @var bool Set to FALSE if the service should be created as non-shared
      */
     protected static $shared = TRUE;
-    
+
     /**
      * @var array The default configuration for the service object. Values will be passed to the constructor based on keys and argument names.
      */
     protected static $default_config = [];
-    
+
     /**
      * @var string|NULL The classname of the service. If set to NULL, an instance of the service class (determined by get_called_class) is used.
      */
     protected static $classname;
-    
+
     /**
      * @var array<string> External classes that are required to create this service.
      */
     protected static $dependencies = [];
-    
+
     /**
      * Returns if the service should be created as a shared service
      *
@@ -157,7 +157,7 @@ abstract class Service extends Object implements ServiceInterface {
     public static function isShared(Loops $loops) {
         return static::$shared;
     }
-    
+
     /**
      * Returns if external class dependencies are available
      *
@@ -181,7 +181,7 @@ abstract class Service extends Object implements ServiceInterface {
     protected static function getDefaultConfig(Loops $loops = NULL) {
         return ArrayObject::fromArray(static::$default_config);
     }
-    
+
     /**
      * Returns the classname of the service.
      *
@@ -194,7 +194,7 @@ abstract class Service extends Object implements ServiceInterface {
     protected static function getClassname(Loops $loops = NULL) {
         return static::$classname ?: get_called_class();
     }
-    
+
     /**
      * Returns the complete config of a service
      *
@@ -210,7 +210,7 @@ abstract class Service extends Object implements ServiceInterface {
      * Example in case a config.ini file is used (which is true for most cases):
      * <code>
      *     ...
-     *     
+     *
      *     [smarty_renderer]
      *     disable_security = TRUE
      *
@@ -225,7 +225,7 @@ abstract class Service extends Object implements ServiceInterface {
         if(!$loops) {
             $loops = Loops::getCurrentLoops();
         }
-        
+
         if(!$config) {
             $parts = explode("\\", get_called_class());
             if(count($parts) > 2 && array_slice($parts, 0, 2) == [ "Loops", "Service" ]) {
@@ -233,17 +233,17 @@ abstract class Service extends Object implements ServiceInterface {
             }
 
             $sectionname = Misc::underscore(implode("\\", $parts));
-            
+
             $config = $loops->getService('config');
             $config = $config->offsetExists($sectionname) ? $config->offsetGet($sectionname) : new ArrayObject;
         }
-        
+
         $result = static::getDefaultConfig($loops);
         $result->merge($config);
         $result->offsetSet('loops', $loops);
         return $result;
     }
-    
+
     /**
      * The factory method that creates the service instance
      *
@@ -260,7 +260,7 @@ abstract class Service extends Object implements ServiceInterface {
     public static function getService(ArrayObject $config, Loops $loops) {
         return Misc::reflectionInstance(static::getClassname($loops), static::getConfig($loops, $config));
     }
-    
+
     /**
      * Checks if all dependent classnames are defined
      *

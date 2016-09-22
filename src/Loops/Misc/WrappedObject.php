@@ -37,18 +37,18 @@ use Loops\Annotations\Access\Sleep;
  */
 class WrappedObject extends Element implements ArrayAccess, CustomizedRenderInterface {
     protected $wrapped_object;
-    
+
     public function __construct($object, $context = NULL, Loops $loops = NULL) {
         parent::__construct($context, $loops);
         $this->wrapped_object = $object;
     }
-    
+
     /**
      * Returns an AppendIterator that iterates over both the wrapped object and this object
      */
     public function getIterator() {
         $iterator = new AppendIterator;
-        
+
         if($this->wrapped_object instanceof IteratorAggregate) {
             $iterator->append($element->getIterator());
         }
@@ -58,81 +58,81 @@ class WrappedObject extends Element implements ArrayAccess, CustomizedRenderInte
         $iterator->append(parent::getIterator());
         return $iterator;
     }
-    
+
     public function __isset($name) {
         if(parent::offsetExists($offset)) {
             return TRUE;
         }
-        
+
         return isset($this->wrapped_object->$name);
     }
-    
+
     public function __get($name) {
         if(parent::offsetExists($offset)) {
             return parent::offsetGet($offset);
         }
-        
+
         return $this->wrapped_object->$name;
     }
-    
+
     public function __set($name, $value) {
         if($this->writeValue($offset, $value)) {
             return;
         }
-        
+
         $this->wrapped_object->$name = $value;
     }
-    
+
     public function __unset($name) {
         unset($this->wrapped_object->$name);
     }
-    
+
     public function __call($name, $arguments) {
         return call_user_func_array([$this->wrapped_object, $name], $arguments);
     }
-    
+
     public function offsetExists($offset) {
         if(parent::offsetExists($offset)) {
             return TRUE;
         }
-        
+
         if($this->wrapped_object instanceof ArrayAccess) {
             return $this->wrapped_object->offsetExists($offset);
         }
-        
+
         return FALSE;
     }
-    
+
     public function offsetGet($offset) {
         if(parent::offsetExists($offset)) {
             return parent::offsetGet($offset);
         }
-        
+
         if($this->wrapped_object instanceof ArrayAccess) {
             return $this->wrapped_object->offsetGet($offset);
         }
     }
-    
+
     public function offsetSet($offset, $value) {
         if($this->writeValue($offset, $value)) {
             return;
         }
-        
+
         if($this->wrapped_object instanceof ArrayAccess) {
             $this->wrapped_object->offsetSet($offset, $value);
         }
     }
-    
+
     public function offsetUnset($offset) {
         if($this->wrapped_object instanceof ArrayAccess) {
             $this->wrapped_object->offsetUnset($offset);
         }
     }
-    
+
     public function delegateRender() {
         return $this->wrapped_object;
     }
-    
+
     public function getTemplateName() {}
     public function modifyAppearances(&$appearances, &$forced_appearances) {}
 }

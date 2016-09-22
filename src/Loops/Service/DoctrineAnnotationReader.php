@@ -23,7 +23,7 @@ class DoctrineAnnotationReader extends Service {
         if(substr($classname, 0, 18) == "Loops\Annotations\\") {
             return class_exists($classname);
         }
-        
+
         return FALSE;
     }
 

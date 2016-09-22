@@ -23,7 +23,7 @@ class WebApplication extends Application {
      * @ReadOnly
      */
     protected $url;
-    
+
     /**
      * @param string The requested URL
      * @param string|NULL $method The request method or NULL if the value from $_SERVER should be used
@@ -39,45 +39,45 @@ class WebApplication extends Application {
         if($method === NULL) {
             $method = @$_SERVER['REQUEST_METHOD'] ?: "GET";
         }
-        
+
         if($get === NULL) {
             $get = $_GET;
         }
-        
+
         if($post === NULL) {
             $post = $_POST;
         }
-        
+
         if($cookie === NULL) {
             $cookie = $_COOKIE;
         }
-        
+
         if($files === NULL) {
             $files = $_FILES;
         }
-        
+
         if($server === NULL) {
             $server = $_SERVER;
         }
-        
+
         if($is_ajax === NULL) {
             $is_ajax = !empty($server['HTTP_X_REQUESTED_WITH']) && strtolower($server['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
         }
-        
+
         $request = new Request($method, $get, $post, $cookie, $files, $server, $is_ajax);
         $response = new Response;
-        
+
         //initialize context
         $this->getLoops()->registerService("request", $request);
         $this->getLoops()->registerService("response", $response);
-        
+
         //set url for reference
         $this->url = $url;
-        
+
         //boot
         $this->boot();
     }
-    
+
     /**
      * Runs the request by by dispaching the request via the web core service.
      * This method will print the resulting output and set http status codes accordingly.
@@ -88,7 +88,7 @@ class WebApplication extends Application {
             $request  = $this->getLoops()->getService("request");
             $response = $this->getLoops()->getService("response");
             $web_core = $this->getLoops()->getService("web_core");
-            
+
             //dispatch request
             echo $web_core->dispatch($this->url, $request, $response);
         }

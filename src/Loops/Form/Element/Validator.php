@@ -20,15 +20,15 @@ use Loops\Annotations\Form\Validator as ValidatorAnnotation;
 
 abstract class Validator extends Object {
     use AccessTrait;
-    
+
     protected $last = FALSE;
     protected $break = FALSE;
     protected $null = FALSE;
-    
+
     public function isLast() {
         return $this->last;
     }
-    
+
     public function doBreak() {
         $b = "break";
         return $this->$b;
@@ -37,6 +37,6 @@ abstract class Validator extends Object {
     public function validateNull() {
         return $this->null;
     }
-    
+
     abstract function validate($value, Element $element);
 }

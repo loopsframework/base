@@ -24,12 +24,12 @@ class EntityAdmin extends Object {
      * @Required
      */
     public $entity;
-    
+
     /**
      * @var string
      */
     public $class = "Loops\Doctrine\EntityAdmin";
-    
+
     /**
      * @var array<string>
      */

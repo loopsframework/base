@@ -28,7 +28,7 @@ class UpdateEntityForm extends EntityForm {
         $doctrine->flush();
         return TRUE;
     }
-    
+
     /**
      * @Listen("Session\onSave")
      */

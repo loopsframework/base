@@ -17,7 +17,7 @@ use Loops\Form\Element\Filter\Text as TextFilter;
 
 class Text extends Element {
     public $placeholder = "";
-    
+
     public function __construct($default = "", $validators = [], $filters = [], $context = NULL, Loops $loops = NULL) {
         parent::__construct($default, $validators, $filters, $context, $loops);
         $this->addInternalFilter(new TextFilter($loops));

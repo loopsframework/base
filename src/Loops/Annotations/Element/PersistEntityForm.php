@@ -23,12 +23,12 @@ class PersistEntityForm extends Object {
      * @Required
      */
     public $entity;
-    
+
     /**
-     * @var string 
+     * @var string
      */
     public $class = "Loops\Doctrine\PersistEntityForm";
-    
+
     /**
      * @var array<string>
      */

@@ -30,25 +30,25 @@ use ReflectionClass;
  */
 class WebCore extends Service {
     use AccessTrait;
-    
+
     /**
      * @var Loops\Element|string The selected page element or the classname as a string during its construction
      *
      * See method resolvePage for details on how a page is selected
-     * 
+     *
      * @ReadOnly
      */
     protected $page;
-    
+
     /**
      * @var array<string> The page parameters, which are taken from the url for every _ namespace of the page classname.
      *
      * See method resolvePage for details
-     * 
+     *
      * @ReadOnly
      */
     protected $page_parameter = [];
-    
+
     /**
      * @var array<string> Remaining parameters from the url
      *
@@ -57,23 +57,23 @@ class WebCore extends Service {
      * @ReadOnly
      */
     protected $parameter = [];
-    
+
     /**
      * @ReadOnly
      */
     protected $error_page;
-    
+
     /**
      * @ReadOnly
      */
     protected $base_url;
-    
+
     public function __construct($base_url = "/", $error_page = "Loops\ErrorPage", Loops $loops = NULL) {
         parent::__construct($loops);
         $this->base_url = $base_url;
         $this->error_page = $error_page;
     }
-    
+
     /**
      * Dispatches a web request to an url and returns the contents to display
      *
@@ -92,29 +92,29 @@ class WebCore extends Service {
      */
     public function dispatch($url, Request $request, Response $response) {
         $output = $this->resolveOutput($url, $request->isAjax());
-        
+
         if(is_object($output)) {
             if($output instanceof ElementInterface) {
                 $response->addHeader("X-Loops-ID", $output->getLoopsId());
             }
-            
+
             $output = $this->display($output, $request, $response);
         }
-        
+
         $response->setHeader();
-        
+
         return $output;
     }
-    
+
     private function resolveOutput($url, $is_ajax) {
         $loops = $this->getLoops();
-        
+
         foreach($this->resolvePage($url) as $set) {
             list($pageclass, $this->page_parameter, $this->parameter) = $set;
-            
+
             $this->page = $pageclass;
             $this->page = Misc::reflectionInstance($pageclass, ["parameter" => $this->page_parameter, "loops" => $loops]);
-            
+
             $action_result = $this->page->action($this->parameter);
 
             if(is_string($action_result)) {
@@ -133,7 +133,7 @@ class WebCore extends Service {
                 if($action_result == 404) {
                     continue;
                 }
-                
+
                 if($action_result <= 0) {
                     return "";
                 }
@@ -143,7 +143,7 @@ class WebCore extends Service {
                 return $this->page;
             }
         }
-        
+
         $this->page_parameter = [];
         $this->parameter = $url == "/" ? [] : explode("/", ltrim($url, "/"));
         $this->page = Misc::reflectionInstance($this->error_page, [ 'status_code' => 404, 'loops' => $loops ]);
@@ -166,14 +166,14 @@ class WebCore extends Service {
         $count = array_count_values(explode("\\", $pageclass));
         return array_key_exists("_", $count) ? $count["_"] : 0;
     }
-    
+
     /**
      * Renders an object with the renderer
      */
     private function display($element, Request $request, Response $response) {
         $loops = $this->getLoops();
         $renderer = $loops->getService("renderer");
-        
+
         $appearance = [];
 
         if($request->isAjax()) {
@@ -184,7 +184,7 @@ class WebCore extends Service {
 
         return $renderer->render($element, $appearance);
     }
-    
+
     /**
      * Generates the page path for a page element
      *
@@ -196,77 +196,77 @@ class WebCore extends Service {
      */
     public static function getPagePathFromClassname($classname, $page_parameter = [], Loops $loops = NULL) {
         $count = count($page_parameter);
-        
+
         if(!$routes = self::getRoutes($loops ?: Loops::getCurrentLoops())) {
             return FALSE;
         }
-        
+
         $routes = array_filter($routes, function($value, $key) use ($classname, $count) {
             if($classname != str_replace("*", "_", $value)) {
                 return FALSE;
             }
-            
+
             if(substr_count($key, "*") > $count) {
                 return FALSE;
             }
-            
+
             return TRUE;
         }, ARRAY_FILTER_USE_BOTH);
-        
+
         if(!$routes) {
             return FALSE;
         }
-        
+
         $pagepath = key($routes);
-        
+
         while($page_parameter && (($pos = strpos($pagepath, "*")) !== FALSE)) {
             $pagepath = substr($pagepath, 0, $pos).array_shift($page_parameter).substr($pagepath, $pos+1);
         }
 
         return ltrim($pagepath, "/");
     }
-    
+
     /**
-     * Generates an array with all available routes 
+     * Generates an array with all available routes
      */
     private static function getRoutes($loops) {
         $cache = $loops->getService("cache");
         $key = "Loops-WebCore-getRoutes";
-        
+
         if($cache->contains($key)) {
             return $cache->fetch($key);
         }
-        
+
         if(!$loops->hasService("application")) {
             return FALSE;
         }
-        
+
         $classnames = $loops->getService("application")->definedClasses();
-    
+
         $classnames = array_filter($classnames, function($classname) {
             return substr($classname, 0, 6) == "Pages\\";
         });
-        
+
         $routes = [];
-        
+
         foreach($classnames as $classname) {
             if(!in_array("Loops\ElementInterface", class_implements($classname))) {
                 continue;
             }
-            
+
             if(!$classname::isPage()) {
                 continue;
             }
-            
+
             $reflection = new ReflectionClass($classname);
             if($reflection->isAbstract()) {
                 continue;
             }
-            
+
             if(substr($reflection->getFileName(), -strlen($classname)-4, strlen($classname)) != str_replace("\\", "/", $classname)) {
                 continue;
             }
-            
+
             $classbase = substr(str_replace("\\", "/", strtolower($classname)), 5);
 
             if(substr($classbase, -6) == "/index") {
@@ -275,16 +275,16 @@ class WebCore extends Service {
 
             $routes[str_replace("_", "*", substr($classbase, 1))] = $classname;
         }
-        
+
         uksort($routes, function($a, $b) {
             return substr_count($b, "/") - substr_count($a, "/") ?: strlen($b) - strlen($a);
         });
-        
+
         $cache->save($key, $routes);
 
         return $routes;
     }
-    
+
     /**
      * Find the page object that should be displayed based on the accessed url
      *
@@ -331,11 +331,11 @@ class WebCore extends Service {
             }
 
             $page_parameter = array_slice($match, 1);
-            
+
             //check if regexp conditions are defined via annotations
             if($page_parameter) {
                 $reqs = $this->getLoops()->getService("annotations")->get($pageclass)->find("PageParameter");
-                
+
                 foreach($page_parameter as $parameter) {
                     if($req = array_pop($reqs)) {
                         if($req->regexp) {
@@ -343,19 +343,19 @@ class WebCore extends Service {
                                 continue 2;
                             }
                         }
-                        
+
                         if(is_array($req->allow)) {
                             if(!in_array($parameter, $req->allow)) {
                                 continue 2;
                             }
                         }
-                        
+
                         if(is_array($req->exclude)) {
                             if(in_array($parameter, $req->exclude)) {
                                 continue 2;
                             }
                         }
-                        
+
                         if($req->callback) {
                             if(!call_user_func([$pageclass, $req->callback], $parameter)) {
                                 continue 2;
@@ -364,7 +364,7 @@ class WebCore extends Service {
                     }
                 }
             }
-            
+
             $parameter = ltrim(substr($path, strlen($match[0])), "/");
             $parameter = strlen($parameter) ? array_values(explode("/", $parameter)) : [];
 

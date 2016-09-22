@@ -28,7 +28,7 @@ use Serializable;
  * Loops Objects base class
  *
  * An object that provides magic access to services from a Loops context for convinience.
- * 
+ *
  * All common Loops traits (Event, Access, Resolve) are used.
  * When getting an offset via offsetGet, the value from ResolveTrait is prefered over a value from AccessTrait.
  * If no value could be found, Object tries to find the service at the given offset and returns it.
@@ -47,15 +47,15 @@ class Object implements IteratorAggregate, ArrayAccess, Serializable {
         ResolveTrait::offsetGet as ResolveTraitOffsetGet;
         ResolveTrait::offsetExists as ResolveTraitOffsetExists;
     }
-    
+
     /**
      * @ReadOnly("getLoops")
      */
     protected $loops;
-    
+
     /**
      * The contructror
-     * 
+     *
      * @param Loops\Context $loops The context that is used to resolve services.
      *
      * The content will default to the last Loops context.
@@ -63,7 +63,7 @@ class Object implements IteratorAggregate, ArrayAccess, Serializable {
     public function __construct(Loops $loops = NULL) {
         $this->loops = $loops ?: Loops::getCurrentLoops();
     }
-    
+
     /**
      * Returns the Loops context associated with this object.
      *
@@ -76,10 +76,10 @@ class Object implements IteratorAggregate, ArrayAccess, Serializable {
         if(!$this->loops) {
             $this->loops = Loops::getCurrentLoops();
         }
-        
+
         return $this->loops;
     }
-    
+
     /**
      * Gets a value either via the ResolveTrait, AccessTrait or the loops getService functionality
      *
@@ -92,7 +92,7 @@ class Object implements IteratorAggregate, ArrayAccess, Serializable {
         if($this->ResolveTraitOffsetExists($offset)) {
             return $this->ResolveTraitOffsetGet($offset);
         }
-        
+
         if($this->AccessTraitOffsetExists($offset)) {
             return $this->AccessTraitOffsetGet($offset);
         }
@@ -104,7 +104,7 @@ class Object implements IteratorAggregate, ArrayAccess, Serializable {
 
         user_error("Undefined index: $offset", E_USER_NOTICE);
     }
-    
+
     /**
      * Checks if an offset exists by checking the following:
      *  - check ResolveTrait if an offset exists
@@ -118,42 +118,42 @@ class Object implements IteratorAggregate, ArrayAccess, Serializable {
         if($this->ResolveTraitOffsetExists($offset)) {
             return TRUE;
         }
-        
+
         if($this->AccessTraitOffsetExists($offset)) {
             return TRUE;
         }
-        
+
         return $this->getLoops()->hasService($offset);
     }
-    
+
     /**
      * Shortcut to offsetGet
      */
     public function _($key) {
         return $this->offsetGet($key);
     }
-    
+
     /**
      * Forward magic access to offsetSet
      */
     public function __set($key, $value) {
         $this->offsetSet($key, $value);
     }
-    
+
     /**
      * Forward magic access to offsetGet
      */
     public function __get($key) {
         return $this->offsetGet($key);
     }
-    
+
     /**
      * Forward magic access to offsetExists
      */
     public function __isset($key) {
         return $this->offsetExists($key);
     }
-    
+
     /**
      * Forward magic access to offsetUnset
      */

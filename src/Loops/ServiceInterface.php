@@ -27,7 +27,7 @@ interface ServiceInterface {
      * @return bool This method should return TRUE if the service is a shared service
      */
     public static function isShared(Loops $loops);
-    
+
     /**
      * Factory method of the service
      *
@@ -36,7 +36,7 @@ interface ServiceInterface {
      * @return object This method should return the service instance
      */
     public static function getService(ArrayObject $config, Loops $loops);
-    
+
     /**
      * Defines if the service can be created
      *

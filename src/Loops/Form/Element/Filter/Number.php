@@ -16,7 +16,7 @@ use Loops\Form\Element\Filter;
 
 class Number extends Filter {
     protected $strong = FALSE;
-    
+
     public function filter($value) {
         return (int)$value;
     }

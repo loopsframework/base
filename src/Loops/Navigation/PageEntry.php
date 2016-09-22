@@ -46,12 +46,12 @@ class PageEntry extends Entry {
      * @ReadOnly
      */
     protected $highlight = FALSE;
-    
+
     /**
      * @ReadOnly
      */
     protected $pageclass;
-    
+
     /**
      * @param string|object $page The page where this navigation entry points to
      * @param string|object $highlightgroup If the page inherits from this class/object, the entry will be highlighted. Defaults to $page if not specified.
@@ -59,13 +59,13 @@ class PageEntry extends Entry {
      */
     public function __construct($page, $page_parameter = NULL, $title = "", Loops $loops = NULL) {
         $prefix = "Pages\\";
-        
+
         if(!$loops) {
             $loops = Loops::getLoops();
         }
-        
+
         $core = $loops->getService("web_core");
-        
+
         $this->pageclass = $pageclass = is_object($page) ? get_class($page) : $prefix.$page;
 
         if(!class_exists($pageclass)) {
@@ -77,7 +77,7 @@ class PageEntry extends Entry {
         if($page_parameter === NULL) {
             $page_parameter = array_slice($core->page_parameter, 0, $count);
         }
-        
+
         if(!$title) {
             if($annotation = $loops->getService("annotations")->get($this->pageclass)->findFirst("Navigation\Title")) {
                 $title = $annotation->title;
@@ -95,11 +95,11 @@ class PageEntry extends Entry {
                 $title = $page;
             }
         }
-            
+
         $link = WebCore::getPagePathFromClassname($pageclass, $page_parameter);
-        
+
         parent::__construct($link, $title, $loops);
-        
+
         $this->highlight = is_a($core->page, $pageclass, TRUE) && implode("/", array_slice($core->page_parameter, 0, $count)) == implode("/", array_slice($page_parameter, 0, $count));
     }
 }

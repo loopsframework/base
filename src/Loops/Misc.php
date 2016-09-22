@@ -46,13 +46,13 @@ class Misc
             $topath = $frompath;
             $frompath = getcwd();
         }
-        
+
         if($frompath == ".") $frompath = getcwd();
         if($topath == ".") $topath = getcwd();
-        
+
         if($frompath[0] != DIRECTORY_SEPARATOR) $frompath = getcwd().DIRECTORY_SEPARATOR.$frompath;
         if($topath[0] != DIRECTORY_SEPARATOR) $topath = getcwd().DIRECTORY_SEPARATOR.$topath;
-        
+
         $from    = explode(DIRECTORY_SEPARATOR, $frompath); // Folders/File
         $to      = explode(DIRECTORY_SEPARATOR, $topath); // Folders/File
         $relpath = '';
@@ -78,7 +78,7 @@ class Misc
                 $relpath .= $to[$i] . DIRECTORY_SEPARATOR;
             $i++;
         }
-        
+
         // Strip last separator
         return substr($relpath, 0, -1) ?: ".";
     }
@@ -98,7 +98,7 @@ class Misc
     public static function camelize($string) {
         return ucfirst(preg_replace_callback("/_[a-z]/", function($match) { return strtoupper($match[0][1]); }, $string));
     }
-    
+
     /**
      * Transforms a string into underscore format
      *
@@ -133,7 +133,7 @@ class Misc
      * You can conveniently use this funcion in the action method of loops elements:
      * <code>
      *   use Loops\Misc;
-     *   
+     *
      *   public function action($parameter) {
      *       return Misc::servefile("example.png");
      *   }
@@ -154,18 +154,18 @@ class Misc
         if(headers_sent()) {
             throw new Exception("Can't serve file because output headers have already been sent.");
         }
-        
+
         if(!$force) {
             if(!@file_exists($file)) {
                 return 404;
             }
-            
+
             if(!@is_readable($file)) {
                 return 403;
             }
         }
-        
-        
+
+
         //detect mimetype - note that spl fileobject does not support this over data urls for some reason
         if($mimetype === TRUE) {
             $mimetype = "application/octet-stream";
@@ -177,12 +177,12 @@ class Misc
                 finfo_close($finfo);
             }
         }
-        
+
         //open file
         if(!($file instanceof SplFileObject)) {
             $file = new SplFileObject($file);
         }
-        
+
         //get size
         $filesize = $file->getSize();
 
@@ -261,10 +261,10 @@ class Misc
             if($filename === TRUE) {
                 $filename = basename($file);
             }
-            
+
             // get user-agent from header
             $useragent = FALSE;
-    
+
             if(isset($_SERVER["HTTP_USER_AGENT"])) {
                 $useragent = $_SERVER["HTTP_USER_AGENT"];
             }
@@ -313,12 +313,12 @@ class Misc
         }
 
         //actual output happens from now on
-        
+
         //set status code and header
         if(!$context) {
             $context = Loops::getCurrentLoops();
         }
-        
+
         if($partial) {
             $context->response->setStatusCode(206);
         }
@@ -326,9 +326,9 @@ class Misc
         foreach($headers as $line) {
             $context->response->addHeader($line);
         }
-        
+
         $context->response->setHeader();
-        
+
         if($filesize) {
             if($partial) {
                 $bytes = Misc::readPartialFile($file, $partial[0], $partial[1], $context);
@@ -384,12 +384,12 @@ class Misc
             if(!@file_exists($file)) {
                 return 404;
             }
-            
+
             if(!@is_readable($file)) {
                 return 403;
             }
         }
-        
+
         //open file
         if(!($file instanceof SplFileObject)) {
             $file = new SplFileObject($file);
@@ -432,7 +432,7 @@ class Misc
 
         return $length;
     }
-    
+
     /**
      * Flattens an array, preserving keys delimited by a delimiter
      *
@@ -445,9 +445,9 @@ class Misc
         if(!is_array($array)) {
             return $array;
         }
-        
+
         $result = array();
-        
+
         foreach($array as $key => $value) {
             if(is_array($value)) {
                 $result = array_merge($result, self::flattenArray($value, $delimiter, $prefix.$key.$delimiter));
@@ -459,7 +459,7 @@ class Misc
 
         return $result;
     }
-    
+
     /**
      * Unflattens an array by a delimiter.
      *
@@ -469,7 +469,7 @@ class Misc
      *
      * <code>
      *     use Loops\Misc;
-     *     
+     *
      *     $flatarray = array(
      *         'a'     => 1,
      *         'b.a'   => 2,
@@ -486,7 +486,7 @@ class Misc
      *     //            )
      *     //     )
      * </code>
-     * 
+     *
      * @param array $array The array that will be unflattened.
      * @param string $delimiter The used delimiter.
      * @return array The unflattened array
@@ -495,46 +495,46 @@ class Misc
         if(!is_array($array)) {
             return $array;
         }
-        
+
         $add = array();
-        
+
         foreach($array as $key => $value) {
             if(strpos($key, $delimiter) === FALSE) {
                 continue;
             }
 
             $add[] = [ explode($delimiter, $key), $value ];
-            
+
             unset($array[$key]);
         }
-        
+
         foreach($add as $pair) {
             $current = &$array;
-            
+
             while(!is_null($key = array_shift($pair[0]))) {
                 if(!is_array($current)) {
                     $current = array();
                 }
-                
+
                 if(!array_key_exists($key, $current)) {
                     $current[$key] = array();
                 }
-                
+
                 $current = &$current[$key];
             }
-            
+
             $current = $pair[1];
         }
-        
+
         return $array;
     }
-    
+
     /**
      * Sets up redirect headers in the response
      *
      * This function returns the desired http status code and thus can be conveniently use.
      * If a loops element is passed, the page path of that element will be used for redirection.
-     * 
+     *
      * <code>
      *     use Loops\Misc;
      *     ...
@@ -542,7 +542,7 @@ class Misc
      *         return Misc::redirect("http://www.example.com")
      *     }
      * </code>
-     * 
+     *
      * <code>
      *     use Loops\Misc;
      *     ...
@@ -569,16 +569,16 @@ class Misc
         if($target instanceof ElementInterface) {
             $target = $core->base_url.$target->getPagePath();
         }
-        
+
         if(!is_string($target)) {
             throw new Exception("Target must be string or implement 'Loops\ElementInterface'.");
         }
-        
+
         $response->addHeader("Location: ".$target.$request->getQuery());
-        
+
         return $status_code;
     }
-    
+
     /**
      * Clones an object and all properties of it that are also objects.
      * Cross references are kept. This method uses the reflection API, private
@@ -594,19 +594,19 @@ class Misc
      */
     public static function deepClone($object) {
         static $copy_list = [];
-        
+
         $hash = spl_object_hash($object);
-        
+
         if(!empty($copy_list[$hash])) {
             return $copy_list[$hash];
         }
-        
+
         $top = empty($copy_list);
-        
+
         $copy_list[$hash] = $result = clone $object;
-        
+
         //leave object untouched if it took care about its own cloning
-        if(!method_exists($object, "__clone")) {        
+        if(!method_exists($object, "__clone")) {
             $r = new ReflectionObject($result);
             foreach($r->getProperties(ReflectionProperty::IS_PUBLIC | ReflectionProperty::IS_PROTECTED | ReflectionProperty::IS_PRIVATE) as $p) {
                 $p->setAccessible(TRUE);
@@ -615,14 +615,14 @@ class Misc
                 $p->setValue($result, self::deepClone($v));
             }
         }
-        
+
         if($top) {
             $copy_list = [];
         }
-        
+
         return $result;
     }
-    
+
     /**
      * Retrieves the current locale
      *
@@ -646,7 +646,7 @@ class Misc
      */
     public static function setlocale($locale, $category = LC_ALL) {
         static $localeCache = NULL;
-        
+
         if(setlocale($category, $locale)) return TRUE;
 
         //try with .utf8
@@ -664,14 +664,14 @@ class Misc
         //there is a suitable one available for us
         if($localeCache === NULL) {
             exec("locale -a", $output, $retval);
-            
+
             $localeCache = $output;
-            
+
             if($retval) {
                 return FALSE;
             }
         }
-        
+
         foreach(self::$localeCache as $available) {
             $testavailable  = strtolower($available);
             $testlocale     = strtolower(str_replace('-', '_', $locale));
@@ -683,7 +683,7 @@ class Misc
         //we have tried to do everything but we failed, too bad
         return FALSE;
     }
-    
+
     /**
      * Recursively unlinks a directory
      *
@@ -707,10 +707,10 @@ class Misc
         else {
             $result = FALSE;
         }
-        
+
         return (bool)$result;
     }
-    
+
     /**
      * Recursively created a directory
      *
@@ -734,7 +734,7 @@ class Misc
             return mkdir($pathname, $mode, $recursive);
         }
     }
-    
+
     /**
      * Detects if the last function call (before calling this function) was made recursive.
      *
@@ -746,14 +746,14 @@ class Misc
      */
     public static function detectRecursion($check_args = FALSE) {
         $stack = debug_backtrace($check_args ? DEBUG_BACKTRACE_PROVIDE_OBJECT : DEBUG_BACKTRACE_PROVIDE_OBJECT | DEBUG_BACKTRACE_IGNORE_ARGS);
-        
+
         array_shift($stack);
-        
+
         $function = array_shift($stack);
-        
+
         return in_array($function, $stack, TRUE);
     }
-    
+
     /**
      * Invokes constructors by assembling arguments from an array with the help of the reflection API.
      *
@@ -761,9 +761,9 @@ class Misc
      * Numeric keys can also be used to specify arguments. A number denotes the n-th argument of the constructor.
      * This is especially useful for constructors with a long argument list (where most arguments are defined by default).
      * It can be seen as syntethic sugar to the alternative of passing a single option array as an argument.
-     * 
+     *
      * An exception is thrown if there are missing arguments.
-     * 
+     *
      * Example:
      *
      * <code>
@@ -775,7 +775,7 @@ class Misc
      *         }
      *     }
      * </code>
-     *     
+     *
      * you could instantiate it like this:
      *
      * <code>
@@ -803,7 +803,7 @@ class Misc
         }
 
         $args = self::getReflectionArgs($constructor, $arguments, $missing);
-        
+
         if($missing) {
             $parts = [];
             foreach($missing as $key => $name) {
@@ -812,15 +812,15 @@ class Misc
             $missing = implode(", ", $parts);
             throw new Exception("Can not create object of type '$classname'. Argument $missing needs to be set.");
         }
-        
+
         $instance = $reflection->newInstanceArgs($args);
-        
+
         if($set_remaining) {
             foreach($arguments as $key => $value) {
                 if(is_array($set_include) && !in_array($key, $set_include)) {
                     continue;
                 }
-                
+
                 if(is_array($set_exclude) && in_array($key, $set_exclude)) {
                     continue;
                 }
@@ -828,11 +828,11 @@ class Misc
                 $instance->$key = $value;
             }
         }
-        
+
         return $instance;
     }
-    
-    
+
+
     /**
      * Invokes functions by assembling arguments from an array with the help of the reflection API.
      *
@@ -840,16 +840,16 @@ class Misc
      */
     public static function reflectionFunction($function, $arguments = []) {
         $method = is_array($function);
-        
+
         if($method) {
             $reflection = new ReflectionMethod($function[0], $function[1]);
         }
         else {
             $reflection = new ReflectionFunction($function);
         }
-        
+
         $args = self::getReflectionArgs($reflection, $arguments, $missing);
-        
+
         if($missing) {
             $name = $reflection->getName();
             $parts = [];
@@ -859,10 +859,10 @@ class Misc
             $missing = implode(", ", $parts);
             throw new Exception("Can not call function '$name'. Argument(s) $missing need to be set.");
         }
-        
+
         return $method ? $reflection->invokeArgs($function[0], $args) : $reflection->invokeArgs($args);
     }
-    
+
     /**
      * Assembles an array for call_user_func_array (or similiar) that includes default values obtained by reflection API
      *
@@ -871,7 +871,7 @@ class Misc
     public static function getReflectionArgs(ReflectionFunctionAbstract $reflection, $arguments = [], &$missing = []) {
         $args    = [];
         $missing = [];
-        
+
         foreach($reflection->getParameters() as $key => $parameter) {
             if(array_key_exists($key, $arguments)) {
                 $args[] = $arguments[$key];
@@ -888,10 +888,10 @@ class Misc
                 $missing[$key] = $name;
             }
         }
-        
+
         return $missing ? FALSE : $args;
     }
-    
+
     /**
      * Finds the lastest change in a directory since the last call, if there were any.
      *
@@ -907,32 +907,32 @@ class Misc
             if(!is_dir($dir)) return [];
             return iterator_to_array(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir)));
         }, (array)$dirs));
-        
+
         if(!$files) {
             return NULL;
         }
 
         $files = array_filter($files, function($file) { return !is_link($file); });
-        
+
         usort($files, function($a, $b) { return $b->getMTime() - $a->getMTime(); });
 
         if(!$cache) {
             return $files[0];
         }
-        
+
         $lastchange = $files[0]->getMTime();
 
         $cache_key = "Loops-Misc-filesChanged-".implode("-", $dirs);
-        
+
         if($cache->contains($cache_key)) {
             $mtime = $cache->fetch($cache_key);
         }
         else {
             $mtime = FALSE;
         }
-        
+
         $cache->save($cache_key, $lastchange);
-        
+
         if($mtime != $lastchange) {
             return $files[0];
         }
@@ -953,7 +953,7 @@ class Misc
         if($html === NULL) {
             $html = isset($_SERVER["REQUEST_METHOD"]);
         }
-        
+
         if($html) {
             http_response_code(500);
             ?><!DOCTYPE html>
@@ -978,20 +978,20 @@ class Misc
         }
         else {
             $width = 80;
-            
+
             $message = call_user_func_array("array_merge", array_map(function($a) use ($width) { return str_split($a, $width-4); }, explode("\n", $exception->getMessage())));
             $eline = call_user_func_array("array_merge", array_map(function($a) use ($width) { return str_split($a, $width-12); }, explode("\n", $exception->getLine())));
             $file = call_user_func_array("array_merge", array_map(function($a) use ($width) { return str_split($a, $width-12); }, explode("\n", $exception->getFile())));
             $trace = call_user_func_array("array_merge", array_map(function($a) use ($width) { return str_split($a, $width-6); }, explode("\n", $exception->getTraceAsString())));
-            
+
             foreach($eline as $key => $value) {
                 $eline[$key] = $key ? "      │ $value" : "Line: │ $value";
             }
-            
+
             foreach($file as $key => $value) {
                 $file[$key] = $key ? "      │ $value" : "File: │ $value";
             }
-            
+
             $len = max(array_map("mb_strlen", array_merge($message, $eline, $file, ["Trace:"], $trace)))+6;
 
             echo "╔".str_repeat("═", $len-2)."╗\n";
@@ -1015,7 +1015,7 @@ class Misc
             echo "╚".str_repeat("═", $len-2)."╝\n";
         }
     }
-    
+
     /**
      * Gets the full path from relative paths
      *
@@ -1033,12 +1033,12 @@ class Misc
         if(substr($path, 0, 1) == DIRECTORY_SEPARATOR) {
             return $path;
         }
-        
+
         //windows style full paths
         if(substr($path, 1, 2) == ":\\") {
             return $path;
         }
-        
+
         //throw exception if there are parent paths
         if(!$allow_parent) {
             $parts = explode(DIRECTORY_SEPARATOR, $path);
@@ -1049,7 +1049,7 @@ class Misc
 
         //get paths (with unresolved parent paths)
         $path = rtrim($cwd ?: getcwd(), DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.$path;
-        
+
         //adjust windows paths for further processing
         if(substr($path, 1, 2) == ":\\") {
             $prefix = substr($path, 0, 3);
@@ -1058,28 +1058,28 @@ class Misc
         else {
             $prefix = "";
         }
-        
+
         //get parts
         $parts = explode(DIRECTORY_SEPARATOR, $path);
-        
+
         //remove parts in front of .. parts
         $result = [];
-        
+
         while($parts) {
             $part = array_shift($parts);
-            
+
             if($part == "..") {
                 if(count($result) <= 1) {
                     throw new Exception("'$path' can not exist.");
                 }
-                
+
                 array_pop($result);
             }
             else {
                 array_push($result, $part);
             }
         }
-        
+
         //return new assembled path
         return $prefix.implode(DIRECTORY_SEPARATOR, $result);
     }

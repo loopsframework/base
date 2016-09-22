@@ -15,42 +15,42 @@ class Response {
     public $status_code;
     public $status_message;
     public $extra_header = [];
-    
+
     public function __construct($status_code = 200) {
         $this->setStatusCode($status_code);
     }
-    
+
     public function setStatusCode($status_code, $text = "") {
         $this->status_code = $status_code;
         $this->status_message = self::statusCodeText($status_code, $text);
     }
-    
+
     public function setHeader() {
         if(headers_sent()) {
             return FALSE;
         }
-        
+
         $protocol = isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : "HTTP/1.1";
         header($protocol." ".$this->status_code." ".$this->status_message, TRUE, $this->status_code);
         array_walk($this->extra_header, "header");
         return TRUE;
     }
-    
+
     public function addHeader($line, $value = NULL) {
         if($value !== NULL) {
             $line = "$line: $value";
         }
         $this->extra_header[] = $line;
     }
-    
+
     public function removeHeader($line) {
         $this->extra_header = array_diff($this->extra_header, [$line]);
     }
-    
+
     public function setJson($charset = "UTF-8") {
         header("Content-Type: text/json; charset=$charset");
     }
-    
+
     /**
      * Lookup a text representation of HTTP status codes.
      *

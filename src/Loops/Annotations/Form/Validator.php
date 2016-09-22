@@ -23,12 +23,12 @@ class Validator extends Object {
      * @Required
      */
     public $class;
-    
+
     /**
      * @var string|array<string>
      */
     public $filter = [ "" ];
-    
+
     /**
      * @var bool
      */
