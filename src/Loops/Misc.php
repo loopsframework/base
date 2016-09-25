@@ -26,6 +26,7 @@ use ReflectionMethod;
 use ReflectionProperty;
 use SplFileObject;
 use SplStack;
+use Throwable;
 
 /**
  * Miscellaneous extra functions that are used within the loops framework
@@ -949,7 +950,7 @@ class Misc
      *
      * @param Exception $e The exeption that will be displayed.
      */
-    public static function displayException(\Exception $exception, $html = NULL) {
+    public static function displayException(Throwable $exception, $html = NULL) {
         if($html === NULL) {
             $html = isset($_SERVER["REQUEST_METHOD"]);
         }

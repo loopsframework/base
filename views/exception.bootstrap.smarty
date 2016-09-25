@@ -2,7 +2,7 @@
 
 {block 'header'}
     <h1>Whooops!</h1>
-    <p>I caught an exception. Can I keep it?</p>
+    <p>I caught an {if $this|is_a:'Error'}error{else}exception{/if}. Can I keep it?</p>
     <hr>
 {/block}
 
@@ -14,7 +14,7 @@
         <h2>{$this|get_class}</h2>
         <p>{$this->getMessage()}</p>
     {/block}
-    
+
     {block 'location'}
         <h3>Location:</h3>
         <p>
@@ -22,7 +22,7 @@
             {$this->getFile()}<br>
         </p>
     {/block}
-    
+
     {block 'trace'}
         <h3>Trace:</h3>
         <pre>{$this->getTraceAsString()}</pre>

@@ -12,6 +12,7 @@
 namespace Loops\Application;
 
 use Exception;
+use Throwable;
 use Loops\Annotations\Access\ReadOnly;
 use Loops\Misc;
 use Loops\Application;
@@ -92,14 +93,14 @@ class WebApplication extends Application {
             //dispatch request
             echo $web_core->dispatch($this->url, $request, $response);
         }
-        catch(Exception $exception) {
+        catch(Throwable $exception) {
             http_response_code(500);
 
             try {
                 $renderer = $this->getLoops()->getService("renderer");
                 echo $renderer->render($exception);
             }
-            catch(Exception $render_exception) {
+            catch(Throwable $render_exception) {
                 Misc::displayException($exception);
             }
         }
