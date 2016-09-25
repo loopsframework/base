@@ -11,7 +11,9 @@
 
 namespace Loops\Form\Element;
 
+use Traversable;
 use Loops;
+use Loops\ArrayObject;
 use Loops\Misc;
 use Loops\Form;
 use Loops\Form\Element;
@@ -47,7 +49,10 @@ class DynamicList extends SubForm {
             $key = $parameter[1];
 
             if($key != "newelement" && !$this->subform->offsetExists($key)) {
-                $this->subform->offsetSet($key, clone $this->newelement);
+                // Clone $this->newelement should be used but shallow cloning
+                // will break loopsid functionality. Implementing deep cloning is a
+                // tough task for Loops\Element objects, maybe consider it later
+                $this->subform->offsetSet($key, $this->newelement);
             }
         }
 
@@ -63,15 +68,35 @@ class DynamicList extends SubForm {
     }
 
     public function setValue($value) {
+        if(is_array($value)) {
+            $value = new ArrayObject($value);
+        }
+
         $current = $this->subform->getFormElements();
 
         foreach(array_keys($current) as $key) {
             $this->subform->offsetUnset($key);
         }
 
-        foreach((array)$value as $k => $v) {
+        if($value instanceof ArrayObject) {
+            $values = $value->toArray();
+        }
+        elseif($value instanceof Traversable) {
+            $values = iterator_to_array($value);
+        }
+        else {
+            $values = (array)$value;
+        }
+
+        static $meh = 0;
+        if($meh++ > 40) {
+            throw new \Exception("Meh");
+        }
+
+        foreach($values as $k => $v) {
             $element = array_key_exists($k, $current) ? $current[$k] : Misc::deepClone($this->newelement);
-            $element->setValue($value[$k]);
+            $element->setValue($v);
+            $value->offsetSet($k, $element->getValue(FALSE));
             $this->subform->offsetSet($k, $element);
         }
 
