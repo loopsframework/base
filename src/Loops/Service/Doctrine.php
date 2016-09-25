@@ -63,14 +63,9 @@ class Doctrine extends Service {
     /**
      * @ReadOnly
      */
-    protected $entity_prefix    = "Entities\\";
-
-    /**
-     * @ReadOnly
-     */
     protected $entity_manager;
 
-    public function __construct($driver = NULL, $dbname = NULL, $host = NULL, $port = NULL, $user = NULL, $password = NULL, $path = NULL, $devmode = TRUE, $entity_prefix = "Entities\\", Loops $loops = NULL) {
+    public function __construct($driver = NULL, $dbname = NULL, $host = NULL, $port = NULL, $user = NULL, $password = NULL, $path = NULL, $devmode = TRUE, Loops $loops = NULL) {
         parent::__construct($loops);
 
         $loops          = $this->getLoops();
@@ -111,7 +106,6 @@ class Doctrine extends Service {
         $this->dbname        = $dbname;
         $this->path          = $path;
         $this->devmode       = $devmode;
-        $this->entity_prefix = $entity_prefix;
 
         //setup doctrine entity maneger
         $databaseConfig = [ "driver"    => $driver,
@@ -121,7 +115,7 @@ class Doctrine extends Service {
                             "dbname"    => $dbname,
                             "path"      => $path ];
 
-        $doctrineConfig = Setup::createAnnotationMetadataConfiguration( [ "{$application->app_dir}/inc/".str_replace("\\", "/", $entity_prefix) ], // $paths
+        $doctrineConfig = Setup::createAnnotationMetadataConfiguration( [ "{$application->app_dir}/inc/" ], // $paths
                                                                         $devmode,
                                                                         "{$application->cache_dir}/doctrine_proxies",
                                                                         $loops->hasService("cache") ? $loops->getService("cache") : NULL,
@@ -153,10 +147,10 @@ class Doctrine extends Service {
     }
 
     public function metadata($entity) {
-        return $this->entity_manager->getMetadataFactory()->getMetadataFor(is_string($entity) ? $this->entity_prefix.$entity : get_class($entity));
+        return $this->entity_manager->getMetadataFactory()->getMetadataFor(is_string($entity) ? $entity : get_class($entity));
     }
 
     public function repository($entity) {
-        return $this->entity_manager->getRepository(is_string($entity) ? $this->entity_prefix.$entity : get_class($entity));
+        return $this->entity_manager->getRepository(is_string($entity) ? $entity : get_class($entity));
     }
 }

@@ -29,9 +29,8 @@ class UpdateEntityAdminHelper extends Element implements CustomizedRenderInterfa
     public function __construct(EntityAdmin $context, $parameter = [], Loops $loops = NULL) {
         parent::__construct($context, $loops);
 
-        $loops      = $this->getLoops();
-        $doctrine   = $loops->getService("doctrine");
-        $classname  = $doctrine->entity_prefix.$context->entity;
+        $classname  = $context->entity;
+        $doctrine   = $this->loops->getService('doctrine');
         $metadata   = $doctrine->getMetadataFactory()->getMetadataFor($classname);
         $identifier = $metadata->getIdentifier();
 

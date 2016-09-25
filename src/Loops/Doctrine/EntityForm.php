@@ -49,12 +49,7 @@ class EntityForm extends Form {
             $loops = Loops::getCurrentLoops();
         }
 
-        //get metadata from doctrine
-        $classname = EntityList::getEntityClassname($entity, $loops);
-
-        if(!is_object($entity)) {
-            $entity = $classname;
-        }
+        $classname = is_object($entity) ? get_class($entity) : $entity;
 
         $properties = $loops->getService("annotations")->get($classname)->properties;
 
@@ -154,12 +149,7 @@ class EntityForm extends Form {
     }
 
     private static function createElementFromMetadataAssoc($form, $loops, $metadata, $default) {
-        $prefix = $loops->getService("doctrine")->entity_prefix;
         $target_entity = $metadata["targetEntity"];
-
-        if(substr($target_entity, 0, strlen($prefix)) != $prefix) {
-            throw new Exception("Relation to unsopported Entity.");
-        }
 
         if(count($metadata["joinColumns"]) > 1) {
             throw new Exception("Multiple join columns are not supported.");

@@ -87,7 +87,7 @@ class EntityList extends Element {
         }
 
         $this->alias = $alias;
-        $this->entity = $entity;
+        $this->entity = is_object($entity) ? get_class($entity) : $entity;
         $this->limit = $limit;
 
         parent::__construct($context, $loops);
@@ -97,7 +97,7 @@ class EntityList extends Element {
 
         $this->builder = new QueryBuilder($doctrine->entity_manager);
         $this->builder->select($alias);
-        $this->builder->from(self::getEntityClassname($entity, $loops), $alias);
+        $this->builder->from(is_object($entity) ? get_class($entity) : $entity, $alias);
 
         foreach($order as $key => $value) {
             if(is_array($value) && is_numeric($key)) {
@@ -109,23 +109,10 @@ class EntityList extends Element {
         }
     }
 
-    public static function getEntityClassname($entity, Loops $loops = NULL) {
-        if(is_object($entity)) {
-            return get_class($entity);
-        }
-
-        if(!$loops) {
-            $loops = Loops::getCurrentLoops();
-        }
-
-        return $loops->getService("doctrine")->entity_prefix.$entity;
-    }
-
     public function queryEntity(array $values, &$unused = [], $strict = TRUE) {
         $loops      = $this->getLoops();
         $doctrine   = $loops->getService("doctrine");
-        $classname  = self::getEntityClassname($this->entity, $loops);
-        $metadata   = $doctrine->getMetadataFactory()->getMetadataFor($classname);
+        $metadata   = $doctrine->getMetadataFactory()->getMetadataFor($this->entity);
         $identifier = $metadata->getIdentifier();
 
         if(is_scalar($values) && count($identifier) == 1) {

@@ -31,7 +31,6 @@ class FilteredEntityList extends EntityList {
 
     public function __construct($entity, $filter = NULL, $fields = [], $limit = 10, $alias = NULL, $order = [], $prepare_callback = NULL, $context = NULL, Loops $loops = NULL) {
         parent::__construct($entity, $limit, $alias, $order, $context, $loops);
-        $classname = EntityList::getEntityClassname($entity);
 
         //set default filter from classname
         if($filter === NULL) {
@@ -41,7 +40,7 @@ class FilteredEntityList extends EntityList {
 
         //create filterform
         $this->filterform = $this->initChild("filterform", new Form(NULL, $filter, $context, $loops));
-        $this->filterform->addFromAnnotations($classname, $filter, $this, $loops);
+        $this->filterform->addFromAnnotations($this->entity, $filter, $this, $loops);
         $this->filterform->onConfirm = function() { return FALSE; };
 
         EntityForm::enhanceFromEntity($this->filterform, $entity, $filter, $fields, $loops);
@@ -90,9 +89,7 @@ class FilteredEntityList extends EntityList {
     public function prepareBuilder($builder, ArrayAccess $value) {
         $loops = $this->getLoops();
 
-        $classname = self::getEntityClassname($this->entity, $loops);
-
-        $metadata = $loops->getService("doctrine")->getMetadataFactory()->getMetadataFor($classname);
+        $metadata = $loops->getService("doctrine")->getMetadataFactory()->getMetadataFor($this->entity);
 
         $qb = $this->builder;
 

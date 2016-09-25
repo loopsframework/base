@@ -16,13 +16,7 @@ use Loops\Annotations\Listen;
 
 class PersistEntityForm extends EntityForm {
     public function __construct($entity, $filter = ["", "persist_entity"], $fields = [], $context = NULL, Loops $loops = NULL) {
-        if(is_string($entity)) {
-            $classname = EntityList::getEntityClassname($entity);
-            parent::__construct(new $classname, $filter, $fields, $context, $loops);
-        }
-        else {
-            parent::__construct($entity, $filter, $fields, $context, $loops);
-        }
+        parent::__construct(is_string($entity) ? new $entity : $entity, $filter, $fields, $context, $loops);
     }
 
     /**
